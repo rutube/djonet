@@ -56,3 +56,6 @@ mclient -d ${db} < t1.sql
 #
 
 monetdb release ${db}
+
+rm ${DOTMONETDBFILE}
+rm t1.sql
