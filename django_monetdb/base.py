@@ -9,14 +9,6 @@ from django_monetdb.creation import DatabaseCreation
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
-class DatabaseIntrospection(BaseDatabaseIntrospection):
-    '''Get meta-data like table names, indexes, etc.'''
-
-    def get_table_list(self, cursor):
-        '''Return a list of table names in the current database.'''
-        cursor.execute("select name from sys.tables;")
-        return [row[0] for row in cursor.fetchall()]
-
 class DatabaseWrapper(BaseDatabaseWrapper):
     """
     Represents a database connection.
