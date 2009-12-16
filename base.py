@@ -71,5 +71,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     This class encapsulates all backend-specific differences, such as the way
     a backend performs ordering or calculates the ID of a recently-inserted
     row.
+    """
 
     pass
