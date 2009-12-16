@@ -3,10 +3,10 @@
 # Create test monetdb.  Destroys any data in that db.
 #
 
-db=testdjangodb
-user=django
-pass=django
-schema=django
+db=test
+user=test
+pass=test
+schema=test
 
 [ "x$1" != "x" ] && db="$1"
 [ "x$2" != "x" ] && user="$2"
@@ -53,11 +53,21 @@ CREATE SCHEMA "${schema}" AUTHORIZATION "${user}";
 
 ALTER USER "${user}" SET SCHEMA "${schema}";
 
+--
+-- 	Note:
+--
+--	By default, MonetDB gives users select permission on the 
+--	tables view in the sys schema.	So we don't need to issue
+--	a grant statment like this:
+--
+--		GRANT select on tables to ${user};
+-- 
+
 EOF
 mclient -d ${db} < t1.sql
 
 #
-# Release, so the django user can log in to the test database.
+# Release, so the test user can log in to the test database.
 #
 
 sudo monetdb release ${db}

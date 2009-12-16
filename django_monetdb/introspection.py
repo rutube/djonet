@@ -1,5 +1,4 @@
 from django.db.backends import BaseDatabaseIntrospection
-from MonetSQLdb import ProgrammingError, OperationalError
 import re
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
@@ -25,7 +24,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
-        cursor.execute("select name from tables;")
+        cursor.execute("select name from sys.tables;")
         return [row[0] for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):

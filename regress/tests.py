@@ -15,7 +15,7 @@ passwd = 'django1'
 
 settings.configure(
     DEBUG=True,
-    DATABASE_ENGINE='monetdb-python',
+    DATABASE_ENGINE='django_monetdb',
     DATABASE_NAME=db,
     DATABASE_USER=user,
     DATABASE_PASSWORD=passwd,
@@ -25,18 +25,10 @@ settings.configure(
 #
 # In order for Django to find our driver for the unit tests, the parent
 # directory of the source must be on the system path, as Django tries
-# to import <DATABASE_ENGINE>.base, or monetdb-python.base.
+# to import monetdb.base.
 #
 
-sys.path.append('../..')
-
-#
-# Some of the first unit tests use the base module directly, so we must 
-# also add the parent directory to the module path.
-#
-
-sys.path.append('../')
-import base
+sys.path.append('..')
 
 def run(cmd):
 	'''Wrapper for subprocess.call that handles errors.'''
@@ -60,26 +52,33 @@ class TestMonetDjango(unittest.TestCase):
 		    (db, user, passwd, schema)
 		run(cmd)
 
-
 	def tearDown(self):
+
+		from django.db import connection
+		connection.close()
+
 		cmd = './zapdb.sh "%s" "%s" "%s" "%s"' % \
 		    (db, user, passwd, schema)
 		run(cmd)
 
 	def testinit(self):
 		'''instantiate our custom database wrapper.'''
-		db = base.DatabaseWrapper({})
+		from django_monetdb.base import DatabaseWrapper
+		db = DatabaseWrapper({})
+		#import django_monetdb
+		#db = django_monetdb.base.DatabaseWrapper({})
 
 	def testcreate(self):
 		'''instantiate a cursor.'''
-		w = base.DatabaseWrapper({})
+		import django_monetdb
+		w = django_monetdb.base.DatabaseWrapper({})
 		c = w.cursor()
 		self.failUnless(c)
 
 	def testbasicsql(self):
 		'''Run some base SQL through cursor.'''
-		w = base.DatabaseWrapper({})
-		c = w.cursor()
+		from django.db import connection
+		c = connection.cursor()
 		s = "CREATE TABLE test (id int, name varchar(10))"
 		c.execute(s)
 		s = "INSERT INTO test values (1, 'one')"
@@ -93,20 +92,16 @@ class TestMonetDjango(unittest.TestCase):
 		row = c.fetchone()
 		self.failUnless(row[0] == 'two')
 
+	def testconnection(self):
+		from django.db import connection
+		c = connection.cursor()
+		self.assert_(c)
+
 	def testsyncdb(self):
-		'''Does syncdb run on testapp/models.py.'''
+		'''Does syncdb run (using models.py in the testapp subdir)?'''
 
 		from django.core.management import call_command
-
 		call_command('syncdb')
 
 if __name__ == '__main__':
-	#unittest.main()
-
-	#
-	# To run an individual test, comment out main() above and uncomment
-	# the following.  Pass the test name you want to run.
-	#
-
-	t = TestMonetDjango('testsyncdb')
-	t.run()
+	unittest.main()

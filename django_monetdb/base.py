@@ -3,6 +3,20 @@ from django.conf import settings
 
 import monetdb.sql as Database
 
+from django_monetdb.introspection import DatabaseIntrospection
+from django_monetdb.creation import DatabaseCreation
+
+DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
+
+class DatabaseIntrospection(BaseDatabaseIntrospection):
+    '''Get meta-data like table names, indexes, etc.'''
+
+    def get_table_list(self, cursor):
+        '''Return a list of table names in the current database.'''
+        cursor.execute("select name from sys.tables;")
+        return [row[0] for row in cursor.fetchall()]
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     """
     Represents a database connection.
@@ -23,6 +37,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         self.features = DatabaseFeatures()
         self.ops = DatabaseOperations()
+        self.validation = BaseDatabaseValidation()
+        self.introspection = DatabaseIntrospection(self)
+        self.creation = DatabaseCreation(self)
 
     def _cursor(self):
 	kwargs = {}
@@ -73,4 +90,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     row.
     """
 
-    pass
+    def quote_name(self, name):
+	'''Return quoted name of table, index or column name.'''
+        if name.startswith('"') and name.endswith('"'):
+            return name 
+	return name
+        #return '"%s"' % (name,)
