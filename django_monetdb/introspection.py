@@ -5,21 +5,15 @@ foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REF
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = {
-        "blob": 'TextField',
-        "date": 'DateField',
-        "timestamp": 'DateTimeField',
-        "decimal": 'DecimalField',
-        "float": 'FloatField',
-        "real": 'FloatField',
-        "double": 'FloatField',
-        "tinyint": 'IntegerField',
-        "shortint": 'IntegerField',
-        "mediumint": 'IntegerField',
-        "bigint": 'IntegerField',
-        "longint": 'IntegerField',
-        "boolean": 'BooleanField',
-        "clob": 'CharField',
-        "varchar": 'CharField',
+        'boolean'	: 'BooleanField',
+        'varchar'	: 'CharField',
+        'date'		: 'DateField',
+        'timestamp'	: 'DateTimeField',
+        'numeric'	: 'FloatField',
+        'int'		: 'IntegerField',
+        'smallint'	: 'IntegerField',
+        'clob'		: 'TextField',
+        'time'		: 'TimeField',
     }
 
     def get_table_list(self, cursor):

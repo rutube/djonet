@@ -59,7 +59,7 @@ class TestMonetDjango(unittest.TestCase):
 
 		cmd = './zapdb.sh "%s" "%s" "%s" "%s"' % \
 		    (db, user, passwd, schema)
-		run(cmd)
+		#run(cmd)
 
 	def testinit(self):
 		'''instantiate our custom database wrapper.'''
@@ -98,7 +98,18 @@ class TestMonetDjango(unittest.TestCase):
 		self.assert_(c)
 
 	def testsyncdb(self):
-		'''Does syncdb run (using models.py in the testapp subdir)?'''
+		'''Does syncdb run (using models.py in the testapp subdir)?
+
+		Note that this does not actually test that fields are created,
+		just that syncdb command exits without error.  For example, 
+		while developing this driver I noticed that the FloatField was
+		not actually created, although syncdb completed.
+
+		As a workaround for this particular issue, I used a float field 
+		in the unique_together section of the Meta subclass.  But that's
+		a one-off test hack; to really test, I should get a model instance
+		and verify it's attributes match what was inserted into the db.
+		'''
 
 		from django.core.management import call_command
 		call_command('syncdb')
