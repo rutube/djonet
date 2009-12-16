@@ -25,15 +25,18 @@ import base
 class TestCursor(unittest.TestCase):
 
 	def setUp(self):
-		cmd = './createdb.sh "%s" "%s" "%s" "%s"' % (db, user, passwd, schema)
+		cmd = './createdb.sh "%s" "%s" "%s" "%s"' % \
+		    (db, user, passwd, schema)
 		try:
 			rc = subprocess.call(cmd, shell=True)
 			if rc == 0:
 				pass	# normal
 			elif rc < 0:
-				self.fail("Child was terminated by signal %s" % (-rc,))
+				self.fail("Child was terminated by signal %s" \
+				    % (-rc,))
 			else:
-				self.fail("Child returned error code %s" % (rc,))
+				self.fail("Child returned error code %s" \
+				    % (rc,))
 		except OSError, e:
 			self.fail("Execution failed:", e)
 
