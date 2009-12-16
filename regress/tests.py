@@ -22,7 +22,7 @@ settings.configure(
 sys.path.append('../')
 import base
 
-class TestCursor(unittest.TestCase):
+class TestMonetDjango(unittest.TestCase):
 
 	def setUp(self):
 		cmd = './createdb.sh "%s" "%s" "%s" "%s"' % \
