@@ -15,14 +15,31 @@ passwd = 'django1'
 
 settings.configure(
     DEBUG=True,
+    DATABASE_ENGINE='monetdb-python',
     DATABASE_NAME=db,
     DATABASE_USER=user,
-    DATABASE_PASSWORD=passwd
+    DATABASE_PASSWORD=passwd,
+    INSTALLED_APPS = ('testapp',),
 )
+
+#
+# In order for Django to find our driver for the unit tests, the parent
+# directory of the source must be on the system path, as Django tries
+# to import <DATABASE_ENGINE>.base, or monetdb-python.base.
+#
+
+sys.path.append('../..')
+
+#
+# Some of the first unit tests use the base module directly, so we must 
+# also add the parent directory to the module path.
+#
+
 sys.path.append('../')
 import base
 
 def run(cmd):
+	'''Wrapper for subprocess.call that handles errors.'''
 	try:
 		rc = subprocess.call(cmd, shell=True)
 		if rc == 0:
@@ -36,6 +53,7 @@ def run(cmd):
 	
 
 class TestMonetDjango(unittest.TestCase):
+	'''Basic tests of MonetDB driver.'''
 
 	def setUp(self):
 		cmd = './createdb.sh "%s" "%s" "%s" "%s"' % \
@@ -75,5 +93,20 @@ class TestMonetDjango(unittest.TestCase):
 		row = c.fetchone()
 		self.failUnless(row[0] == 'two')
 
+	def testsyncdb(self):
+		'''Does syncdb run on testapp/models.py.'''
+
+		from django.core.management import call_command
+
+		call_command('syncdb')
+
 if __name__ == '__main__':
-	unittest.main()
+	#unittest.main()
+
+	#
+	# To run an individual test, comment out main() above and uncomment
+	# the following.  Pass the test name you want to run.
+	#
+
+	t = TestMonetDjango('testsyncdb')
+	t.run()
