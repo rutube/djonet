@@ -45,7 +45,12 @@ class TestMonetDjango(unittest.TestCase):
 		# XXX: delete database created in setup.
 		pass
 
+	def testinit(self):
+		'''instantiate our custom database wrapper.'''
+		db = base.DatabaseWrapper({})
+
 	def testcreate(self):
+		'''instantiate a cursor.'''
 		w = base.DatabaseWrapper({})
 		c = w.cursor()
 		self.failUnless(c)
