@@ -1,6 +1,7 @@
 from django.db.backends import *
+from django.conf import settings
 
-from django.utils import datetime_safe
+import monetdb.sql as Database
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     """
@@ -20,6 +21,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         self.features = DatabaseFeatures()
         self.ops = DatabaseOperations()
+
+    def _cursor(self):
+	kwargs = {}
+        if not self.connection:
+            if settings.DATABASE_USER:
+                kwargs['username'] = settings.DATABASE_USER
+            if settings.DATABASE_NAME:
+                kwargs['database'] = settings.DATABASE_NAME
+            if settings.DATABASE_PASSWORD:
+                kwargs['password'] = settings.DATABASE_PASSWORD
+            self.connection = Database.connect(**kwargs)
+        return self.connection.cursor()
 
 #    def _commit(self):
 #        if self.connection is not None:
