@@ -14,10 +14,10 @@ schema=django
 [ "x$4" != "x" ] && schema="$4"
 
 echo "(re)creating ${db} at ${host}"
-monetdb stop ${db}
-monetdb destroy -f ${db}
-monetdb create ${db} || exit 1
-monetdb start ${db} || exit 1
+sudo monetdb stop ${db}
+sudo monetdb destroy -f ${db}
+sudo monetdb create ${db} || exit 1
+sudo monetdb start ${db} || exit 1
 
 #
 # I couldn't set password on command-line, despite what mclient man
@@ -60,7 +60,7 @@ mclient -d ${db} < t1.sql
 # Release, so the django user can log in to the test database.
 #
 
-monetdb release ${db}
+sudo monetdb release ${db}
 
 rm ${DOTMONETDBFILE}
 rm t1.sql
