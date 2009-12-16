@@ -58,5 +58,22 @@ class TestMonetDjango(unittest.TestCase):
 		c = w.cursor()
 		self.failUnless(c)
 
+	def testbasicsql(self):
+		'''Run some base SQL through cursor.'''
+		w = base.DatabaseWrapper({})
+		c = w.cursor()
+		s = "CREATE TABLE test (id int, name varchar(10))"
+		c.execute(s)
+		s = "INSERT INTO test values (1, 'one')"
+		c.execute(s)
+		s = "INSERT INTO test values (2, 'two')"
+		c.execute(s)
+		s = "INSERT INTO test values (3, 'three')"
+		c.execute(s)
+		s = "SELECT name FROM test WHERE id = 2"
+		self.failUnless(c.execute(s) == 1)
+		row = c.fetchone()
+		self.failUnless(row[0] == 'two')
+
 if __name__ == '__main__':
 	unittest.main()
