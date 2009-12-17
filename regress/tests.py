@@ -61,64 +61,73 @@ class TestMonetDjango(unittest.TestCase):
 		    (db, user, passwd, schema)
 		#run(cmd)
 
-	def testinit(self):
-		'''instantiate our custom database wrapper.'''
-		from django_monetdb.base import DatabaseWrapper
-		db = DatabaseWrapper({})
+#	def testinit(self):
+#		'''instantiate our custom database wrapper.'''
+#		from django_monetdb.base import DatabaseWrapper
+#		db = DatabaseWrapper({})
+#
+#	def testcreate(self):
+#		'''instantiate a cursor.'''
+#		import django_monetdb
+#		w = django_monetdb.base.DatabaseWrapper({})
+#		c = w.cursor()
+#		self.failUnless(c)
+#
+#	def testbasicsql(self):
+#		'''Run some base SQL through cursor.  
+#
+#		This time we get the cursor (and connection) the Django way.
+#		'''
+#		from django.db import connection
+#		c = connection.cursor()
+#		s = "CREATE TABLE test (id int, name varchar(10))"
+#		c.execute(s)
+#		s = "INSERT INTO test values (1, 'one')"
+#		c.execute(s)
+#		s = "INSERT INTO test values (2, 'two')"
+#		c.execute(s)
+#		s = "INSERT INTO test values (3, 'three')"
+#		c.execute(s)
+#		s = "SELECT name FROM test WHERE id = 2"
+#		self.failUnless(c.execute(s) == 1)
+#		row = c.fetchone()
+#		self.failUnless(row[0] == 'two')
+#
+#	def testconnection(self):
+#		'''Get a database connection the Django way.'''
+#		from django.db import connection
+#		c = connection.cursor()
+#		self.assert_(c)
+#
+#	def testsyncdb(self):
+#		'''Does syncdb run (using models.py in the testapp subdir)?
+#
+#		Note that this does not actually test that fields are created,
+#		just that syncdb command exits without error.  For example, 
+#		while developing this driver I noticed that the FloatField was
+#		not actually created, although syncdb completed.
+#
+#		As a workaround for this particular issue, I used a float field 
+#		in the unique_together section of the Meta subclass.  But that's
+#		a one-off test hack; to really test, I should get a model instance
+#		and verify it's attributes match what was inserted into the db.
+#
+#		The core issue is that if db_type() returns None, the field is 
+#		skipped.   And db_type() can return none if you have an error
+#		in your driver's data_type dictionary.
+#		'''
+#
+#		from django.core.management import call_command
+#		call_command('syncdb')
+#
+	def testget_or_create(self):
+		'''get_or_create requires driver to have an "ops" dictionary.
 
-	def testcreate(self):
-		'''instantiate a cursor.'''
-		import django_monetdb
-		w = django_monetdb.base.DatabaseWrapper({})
-		c = w.cursor()
-		self.failUnless(c)
-
-	def testbasicsql(self):
-		'''Run some base SQL through cursor.  
-
-		This time we get the cursor (and connection) the Django way.
+		ref: django/db/models/sql/where.py, make_atom()
 		'''
-		from django.db import connection
-		c = connection.cursor()
-		s = "CREATE TABLE test (id int, name varchar(10))"
-		c.execute(s)
-		s = "INSERT INTO test values (1, 'one')"
-		c.execute(s)
-		s = "INSERT INTO test values (2, 'two')"
-		c.execute(s)
-		s = "INSERT INTO test values (3, 'three')"
-		c.execute(s)
-		s = "SELECT name FROM test WHERE id = 2"
-		self.failUnless(c.execute(s) == 1)
-		row = c.fetchone()
-		self.failUnless(row[0] == 'two')
 
-	def testconnection(self):
-		'''Get a database connection the Django way.'''
-		from django.db import connection
-		c = connection.cursor()
-		self.assert_(c)
-
-	def testsyncdb(self):
-		'''Does syncdb run (using models.py in the testapp subdir)?
-
-		Note that this does not actually test that fields are created,
-		just that syncdb command exits without error.  For example, 
-		while developing this driver I noticed that the FloatField was
-		not actually created, although syncdb completed.
-
-		As a workaround for this particular issue, I used a float field 
-		in the unique_together section of the Meta subclass.  But that's
-		a one-off test hack; to really test, I should get a model instance
-		and verify it's attributes match what was inserted into the db.
-
-		The core issue is that if db_type() returns None, the field is 
-		skipped.   And db_type() can return none if you have an error
-		in your driver's data_type dictionary.
-		'''
-
-		from django.core.management import call_command
-		call_command('syncdb')
+		from testapp.models import Simple
+		obj, created = Simple.objects.get_or_create(name='one')
 
 if __name__ == '__main__':
 	unittest.main()
