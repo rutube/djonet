@@ -5,7 +5,7 @@ import unittest
 from django.conf import settings
 
 #
-# Must configure settings before importing base.
+# Must configure settings before opening database connection.
 #
 
 db = 'testdjangodb1'
@@ -25,7 +25,7 @@ settings.configure(
 #
 # In order for Django to find our driver for the unit tests, the parent
 # directory of the source must be on the system path, as Django tries
-# to import monetdb.base.
+# to import the module django_monetdb.base.
 #
 
 sys.path.append('..')
@@ -65,8 +65,6 @@ class TestMonetDjango(unittest.TestCase):
 		'''instantiate our custom database wrapper.'''
 		from django_monetdb.base import DatabaseWrapper
 		db = DatabaseWrapper({})
-		#import django_monetdb
-		#db = django_monetdb.base.DatabaseWrapper({})
 
 	def testcreate(self):
 		'''instantiate a cursor.'''
@@ -76,7 +74,10 @@ class TestMonetDjango(unittest.TestCase):
 		self.failUnless(c)
 
 	def testbasicsql(self):
-		'''Run some base SQL through cursor.'''
+		'''Run some base SQL through cursor.  
+
+		This time we get the cursor (and connection) the Django way.
+		'''
 		from django.db import connection
 		c = connection.cursor()
 		s = "CREATE TABLE test (id int, name varchar(10))"
@@ -93,6 +94,7 @@ class TestMonetDjango(unittest.TestCase):
 		self.failUnless(row[0] == 'two')
 
 	def testconnection(self):
+		'''Get a database connection the Django way.'''
 		from django.db import connection
 		c = connection.cursor()
 		self.assert_(c)
@@ -109,6 +111,10 @@ class TestMonetDjango(unittest.TestCase):
 		in the unique_together section of the Meta subclass.  But that's
 		a one-off test hack; to really test, I should get a model instance
 		and verify it's attributes match what was inserted into the db.
+
+		The core issue is that if db_type() returns None, the field is 
+		skipped.   And db_type() can return none if you have an error
+		in your driver's data_type dictionary.
 		'''
 
 		from django.core.management import call_command

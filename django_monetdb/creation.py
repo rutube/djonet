@@ -10,6 +10,13 @@ class DatabaseCreation(BaseDatabaseCreation):
 	# XXX: ones.
 	#
 
+	#
+	# Careful with things like %(max_digits)s.  If Django does not
+	# require the property, then db_type() will return None (as
+	# there will be a key error with the data dictionary, and the
+	# field will not be added to the database table!
+	#
+
 	data_types = {
 	    'AutoField'			: 'int AUTO_INCREMENT',
 	    'BooleanField'		: 'boolean',
