@@ -1,7 +1,11 @@
 December 2009
 
-	Build rudimentary Django driver for MonetDB5.
+	A Django driver for the column-store database MonetDB5.
+
+	Approach is to start from a minimal driver and add
+	features as needed.  Look at regress/tests.py to see
+	what works.
 
 	Built using Django 1.1-beta1 and MonetDB CVS head.
 
-	Status: testing.
+	Status: testing.  

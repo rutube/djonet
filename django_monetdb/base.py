@@ -5,16 +5,15 @@ import monetdb.sql as Database
 
 from django_monetdb.introspection import DatabaseIntrospection
 from django_monetdb.creation import DatabaseCreation
+from django_monetdb.operations import DatabaseOperations
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-    """
-    Represents a database connection.
-    """
+    '''A database connection.'''
 
-    ops = None
+    operators = DatabaseOperations.operators
 
     def __init__(self, settings_dict):
         super(DatabaseWrapper, self).__init__(settings_dict)
@@ -74,17 +73,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     #
 
     related_fields_match_type = False
-
-class DatabaseOperations(BaseDatabaseOperations):
-    """
-    This class encapsulates all backend-specific differences, such as the way
-    a backend performs ordering or calculates the ID of a recently-inserted
-    row.
-    """
-
-    def quote_name(self, name):
-	'''Return quoted name of table, index or column name.'''
-        if name.startswith('"') and name.endswith('"'):
-            return name 
-	return name
-        #return '"%s"' % (name,)
