@@ -1,6 +1,7 @@
-Build rudimentary Django driver for MonetDB5.
+December 2009
 
-Initial goal is to support a reporting application with
-lots of data.
+	Build rudimentary Django driver for MonetDB5.
 
-Under construction.
+	Built using Django 1.1-beta1 and MonetDB CVS head.
+
+	Status: testing.

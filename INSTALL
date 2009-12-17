@@ -1,0 +1,16 @@
+The directory
+
+	django_monetdb
+
+and it's files should live at the same level as your Django
+application directory.
+
+For example, if your Django project is foo and your Django
+application is bar, then you want this directory structure:
+
+	foo/
+	 | 
+         +-- bar/
+         |
+         +-- django_monetdb/
+
