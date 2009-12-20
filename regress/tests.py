@@ -61,147 +61,147 @@ class TestMonetDjango(unittest.TestCase):
 		    (db, user, passwd, schema)
 		#run(cmd)
 
-	def testinit(self):
-		'''instantiate our custom database wrapper.'''
-		from django_monetdb.base import DatabaseWrapper
-		db = DatabaseWrapper({})
-
-	def testcreate(self):
-		'''instantiate a cursor.'''
-		import django_monetdb
-		w = django_monetdb.base.DatabaseWrapper({})
-		c = w.cursor()
-		self.failUnless(c)
-
-	def testbasicsql(self):
-		'''Run some base SQL through cursor.  
-
-		This time we get the cursor (and connection) the Django way.
-		'''
-		from django.db import connection
-		c = connection.cursor()
-		s = "CREATE TABLE test (id int, name varchar(10))"
-		c.execute(s)
-		s = "INSERT INTO test values (1, 'one')"
-		c.execute(s)
-		s = "INSERT INTO test values (2, 'two')"
-		c.execute(s)
-		s = "INSERT INTO test values (3, 'three')"
-		c.execute(s)
-		s = "SELECT name FROM test WHERE id = 2"
-		self.failUnless(c.execute(s) == 1)
-		row = c.fetchone()
-		self.failUnless(row[0] == 'two')
-
-	def testconnection(self):
-		'''Get a database connection the Django way.'''
-		from django.db import connection
-		c = connection.cursor()
-		self.assert_(c)
-
-	def testsyncdb(self):
-		'''Does syncdb run (using models.py in the testapp subdir)?
-
-		Note that this does not actually test that fields are created,
-		just that syncdb command exits without error.  For example, 
-		while developing this driver I noticed that the FloatField was
-		not actually created, although syncdb completed.
-
-		As a workaround for this particular issue, I used a float field 
-		in the unique_together section of the Meta subclass.  But that's
-		a one-off test hack; to really test, I should get a model instance
-		and verify it's attributes match what was inserted into the db.
-
-		The core issue is that if db_type() returns None, the field is 
-		skipped.   And db_type() can return none if you have an error
-		in your driver's data_type dictionary.
-		'''
-
-		from django.core.management import call_command
-		call_command('syncdb')
-
-	def testget_or_create(self):
-		'''get_or_create requires driver to have an "ops" dictionary.
-
-		ref: django/db/models/sql/where.py, make_atom()
-		'''
-
-		from django.core.management import call_command
-		call_command('syncdb')
-
-		from testapp.models import Simple
-		obj, created = Simple.objects.get_or_create(name='one')
-
-	def testcascadingdelete(self):
-		'''in Django, deletes cascade.  test this works.'''
-
-		from testapp.models import Simple, Parent, Aunt, GrandParent
-		from django.core.management import call_command
-
-		call_command('syncdb')
-
-		s = Simple(name='one')
-		s.save()
-		s = Simple(name='two')
-		s.save()
-
-		#
-		# Simple record should now be in database.
-		#
-
-		try:
-			s = Simple.objects.get(name='one')
-		except Simple.DoesNotExist:
-			self.fail("didn't save Simple record")
-
-		p = Parent(simple=s, name='p')
-		p.save()
-		try:
-			tst = Parent.objects.get(name='p')
-		except Parent.DoesNotExist:
-			self.fail("didn't save Parent record")
-
-		a = Aunt(simple=s, name='a')
-		a.save()
-		try:
-			tst = Aunt.objects.get(name='a')
-		except Aunt.DoesNotExist:
-			self.fail("didn't save Aunt record")
-
-		gp = GrandParent(parent=p, name='gp')
-		gp.save()
-		try:
-			tst = GrandParent.objects.get(name='gp')
-		except GrandParent.DoesNotExist:
-			self.fail("didn't save GrandParent record")
-
-		s.delete()
-
-		#
-		# Parent, Aunt and GrandParent records should now be gone from database.
-		#
-
-		ok = False
-		try:
-			tst = Parent.objects.get(name='p')
-		except Parent.DoesNotExist:
-			ok = True
-		self.failIf(not ok, "delete did not cascade");
-
-		ok = False
-		try:
-			tst = GrandParent.objects.get(name='gp')
-		except GrandParent.DoesNotExist:
-			ok = True
-		self.failIf(not ok, "delete did not cascade");
-
-		ok = False
-		try:
-			tst = Aunt.objects.get(name='a')
-		except Aunt.DoesNotExist:
-			ok = True
-		self.failIf(not ok, "delete did not cascade");
-
+#	def testinit(self):
+#		'''instantiate our custom database wrapper.'''
+#		from django_monetdb.base import DatabaseWrapper
+#		db = DatabaseWrapper({})
+#
+#	def testcreate(self):
+#		'''instantiate a cursor.'''
+#		import django_monetdb
+#		w = django_monetdb.base.DatabaseWrapper({})
+#		c = w.cursor()
+#		self.failUnless(c)
+#
+#	def testbasicsql(self):
+#		'''Run some base SQL through cursor.  
+#
+#		This time we get the cursor (and connection) the Django way.
+#		'''
+#		from django.db import connection
+#		c = connection.cursor()
+#		s = "CREATE TABLE test (id int, name varchar(10))"
+#		c.execute(s)
+#		s = "INSERT INTO test values (1, 'one')"
+#		c.execute(s)
+#		s = "INSERT INTO test values (2, 'two')"
+#		c.execute(s)
+#		s = "INSERT INTO test values (3, 'three')"
+#		c.execute(s)
+#		s = "SELECT name FROM test WHERE id = 2"
+#		self.failUnless(c.execute(s) == 1)
+#		row = c.fetchone()
+#		self.failUnless(row[0] == 'two')
+#
+#	def testconnection(self):
+#		'''Get a database connection the Django way.'''
+#		from django.db import connection
+#		c = connection.cursor()
+#		self.assert_(c)
+#
+#	def testsyncdb(self):
+#		'''Does syncdb run (using models.py in the testapp subdir)?
+#
+#		Note that this does not actually test that fields are created,
+#		just that syncdb command exits without error.  For example, 
+#		while developing this driver I noticed that the FloatField was
+#		not actually created, although syncdb completed.
+#
+#		As a workaround for this particular issue, I used a float field 
+#		in the unique_together section of the Meta subclass.  But that's
+#		a one-off test hack; to really test, I should get a model instance
+#		and verify it's attributes match what was inserted into the db.
+#
+#		The core issue is that if db_type() returns None, the field is 
+#		skipped.   And db_type() can return none if you have an error
+#		in your driver's data_type dictionary.
+#		'''
+#
+#		from django.core.management import call_command
+#		call_command('syncdb')
+#
+#	def testget_or_create(self):
+#		'''get_or_create requires driver to have an "ops" dictionary.
+#
+#		ref: django/db/models/sql/where.py, make_atom()
+#		'''
+#
+#		from django.core.management import call_command
+#		call_command('syncdb')
+#
+#		from testapp.models import Simple
+#		obj, created = Simple.objects.get_or_create(name='one')
+#
+#	def testcascadingdelete(self):
+#		'''in Django, deletes cascade.  test this works.'''
+#
+#		from testapp.models import Simple, Parent, Aunt, GrandParent
+#		from django.core.management import call_command
+#
+#		call_command('syncdb')
+#
+#		s = Simple(name='one')
+#		s.save()
+#		s = Simple(name='two')
+#		s.save()
+#
+#		#
+#		# Simple record should now be in database.
+#		#
+#
+#		try:
+#			s = Simple.objects.get(name='one')
+#		except Simple.DoesNotExist:
+#			self.fail("didn't save Simple record")
+#
+#		p = Parent(simple=s, name='p')
+#		p.save()
+#		try:
+#			tst = Parent.objects.get(name='p')
+#		except Parent.DoesNotExist:
+#			self.fail("didn't save Parent record")
+#
+#		a = Aunt(simple=s, name='a')
+#		a.save()
+#		try:
+#			tst = Aunt.objects.get(name='a')
+#		except Aunt.DoesNotExist:
+#			self.fail("didn't save Aunt record")
+#
+#		gp = GrandParent(parent=p, name='gp')
+#		gp.save()
+#		try:
+#			tst = GrandParent.objects.get(name='gp')
+#		except GrandParent.DoesNotExist:
+#			self.fail("didn't save GrandParent record")
+#
+#		s.delete()
+#
+#		#
+#		# Parent, Aunt and GrandParent records should now be gone from database.
+#		#
+#
+#		ok = False
+#		try:
+#			tst = Parent.objects.get(name='p')
+#		except Parent.DoesNotExist:
+#			ok = True
+#		self.failIf(not ok, "delete did not cascade");
+#
+#		ok = False
+#		try:
+#			tst = GrandParent.objects.get(name='gp')
+#		except GrandParent.DoesNotExist:
+#			ok = True
+#		self.failIf(not ok, "delete did not cascade");
+#
+#		ok = False
+#		try:
+#			tst = Aunt.objects.get(name='a')
+#		except Aunt.DoesNotExist:
+#			ok = True
+#		self.failIf(not ok, "delete did not cascade");
+#
 	def testutf8(self):
 		'''test that we can save and retrieve utf-8 characters.
 
@@ -219,7 +219,7 @@ class TestMonetDjango(unittest.TestCase):
 		print "cafe=", cafe.encode('utf8')
 		
 		s = Simple(name=cafe)
-		self.failUnless(s.name == cafe)
+		self.failUnless(unicode(s).encode("utf8") == cafe)
 
 if __name__ == '__main__':
 	unittest.main()
