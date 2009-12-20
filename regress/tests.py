@@ -219,7 +219,15 @@ class TestMonetDjango(unittest.TestCase):
 		print "cafe=", cafe.encode('utf8')
 		
 		s = Simple(name=cafe)
-		self.failUnless(unicode(s).encode("utf8") == cafe)
+
+		#
+		#	Note:
+		#  		unicode(s) calls s.__unicode__()
+		#
+		# unicode should not return a string that is encoded as UTF8
+		#
+
+		self.failIf(unicode(s) == cafe.encode('utf8'))
 
 if __name__ == '__main__':
 	unittest.main()
