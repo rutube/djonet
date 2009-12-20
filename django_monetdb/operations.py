@@ -14,23 +14,32 @@ class DatabaseOperations(BaseDatabaseOperations):
 	# to work in MonetDB shell.  If needed, poke around MonetDB
 	# sources to find the SQL grammar--I think they use YACC.
 	#
-	#	'iexact'	: 'LIKE %s',
-	#	'contains'	: 'LIKE BINARY %s',
-	#	'icontains'	: 'LIKE %s',
-	#	'regex'		: 'REGEXP BINARY %s',
-	#	'iregex'	: 'REGEXP %s',
-	#	'istartswith'	: 'LIKE %s',
-	#	'iendswith'	: 'LIKE %s',
-	#	'startswith'	: 'LIKE BINARY %s',
-	#	'endswith'	: 'LIKE BINARY %s',
+	#    'contains'		: 'LIKE BINARY %s',
+	#    'icontains'	: 'LIKE %s',
+	#    'regex'		: 'REGEXP BINARY %s',
+	#    'iregex'		: 'REGEXP %s',
+	#
+	# These ones don't look right ... startswith should end up as:
+	#
+	#		LIKE 'abc%'
+	#
+	# so shouldn't it be something like this?
+	#
+	#		LIKE %s%%
+	#
+	#    'startswith'	: 'LIKE %s',
+	#    'endswith'		: 'LIKE %s',
+	#    'istartswith'	: 'ILIKE %s',
+	#    'iendswith'	: 'ILIKE %s',
 	#
 
 	operators = {
-	    'exact'	: '=  %s',
-	    'gt'	: '>  %s',
-	    'gte'	: '>= %s',
-	    'lt'	: '<  %s',
-	    'lte'	: '<= %s',
+	    'gt'		: '>  %s',
+	    'gte'		: '>= %s',
+	    'lt'		: '<  %s',
+	    'lte'		: '<= %s',
+	    'exact'		: '=  %s',
+	    'iexact'		: 'ILIKE %s',
 	}
 
 	def quote_name(self, name):
@@ -40,9 +49,14 @@ class DatabaseOperations(BaseDatabaseOperations):
 			return name 
 		return '"%s"' % (name,)
 
-#	def date_extract_sql(self, lookup_type, field_name):
-#		# http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
-#		return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+	def date_extract_sql(self, lookup_type, field_name):
+		'''Given a lookup_type of 'year', 'month' or 'day',
+		returns the SQL that extracts a value from the given
+		date field field_name.
+        	'''
+
+		return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
+
 #
 #	def date_trunc_sql(self, lookup_type, field_name):
 #		fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
