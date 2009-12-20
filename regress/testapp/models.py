@@ -10,6 +10,21 @@ class JustAsSimple(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class Parent(models.Model):
+	'''For testing cascading deletes.'''
+	name = models.CharField(max_length=25, unique=True)
+	simple = models.ForeignKey(Simple)
+
+class Aunt(models.Model):
+	'''For testing cascading deletes.'''
+	name = models.CharField(max_length=25, unique=True)
+	simple = models.ForeignKey(Simple)
+
+class GrandParent(models.Model):
+	'''For testing cascading deletes.'''
+	name = models.CharField(max_length=25, unique=True)
+	parent = models.ForeignKey(Parent)
+
 class CommonFieldTypes(models.Model):
 	'''All fields and options listed in Django 1.1-beta docs are below.
 	This class tests some of the more common setups, where common is 

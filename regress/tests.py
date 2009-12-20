@@ -132,5 +132,75 @@ class TestMonetDjango(unittest.TestCase):
 		from testapp.models import Simple
 		obj, created = Simple.objects.get_or_create(name='one')
 
+	def testcascadingdelete(self):
+		'''in Django, deletes cascade.  test this works.'''
+
+		from testapp.models import Simple, Parent, Aunt, GrandParent
+		from django.core.management import call_command
+
+		call_command('syncdb')
+
+		s = Simple(name='one')
+		s.save()
+		s = Simple(name='two')
+		s.save()
+
+		#
+		# Simple record should now be in database.
+		#
+
+		try:
+			s = Simple.objects.get(name='one')
+		except Simple.DoesNotExist:
+			self.fail("didn't save Simple record")
+
+		p = Parent(simple=s, name='p')
+		p.save()
+		try:
+			tst = Parent.objects.get(name='p')
+		except Parent.DoesNotExist:
+			self.fail("didn't save Parent record")
+
+		a = Aunt(simple=s, name='a')
+		a.save()
+		try:
+			tst = Aunt.objects.get(name='a')
+		except Aunt.DoesNotExist:
+			self.fail("didn't save Aunt record")
+
+		gp = GrandParent(parent=p, name='gp')
+		gp.save()
+		try:
+			tst = GrandParent.objects.get(name='gp')
+		except GrandParent.DoesNotExist:
+			self.fail("didn't save GrandParent record")
+
+		s.delete()
+
+		#
+		# Parent, Aunt and GrandParent records should now be gone from database.
+		#
+
+		ok = False
+		try:
+			tst = Parent.objects.get(name='p')
+		except Parent.DoesNotExist:
+			ok = True
+		self.failIf(not ok, "delete did not cascade");
+
+		ok = False
+		try:
+			tst = GrandParent.objects.get(name='gp')
+		except GrandParent.DoesNotExist:
+			ok = True
+		self.failIf(not ok, "delete did not cascade");
+
+		ok = False
+		try:
+			tst = Aunt.objects.get(name='a')
+		except Aunt.DoesNotExist:
+			ok = True
+		self.failIf(not ok, "delete did not cascade");
+	
 if __name__ == '__main__':
 	unittest.main()
