@@ -1,0 +1,79 @@
+	To apply this patch, from root of Monetdb source tree,
+	execute the following commands:
+
+		$ cd clients/src/python/monetdb/sql
+		$ patch -p0 < monetdb.sql.converters.diff
+
+	
+--- converters.py.orig	2009-12-18 14:39:55.000000000 -0500
++++ converters.py	2009-12-18 14:40:07.000000000 -0500
+@@ -62,10 +62,60 @@
+     def __string(self, data):
+         return str(data)
+ 
++    def __strip_c_escapes(self, data):
++	'''If a field in the database contains a new-line character 
++	(i.e., '\n'), then (surprisingly, to me anyway) the MAPI call
++	returns a string with the two-character sequence '\' 'n' instead
++	of the single new-line character.
++
++	Because of this behavior, simply replacing '\' '\' sequences with
++	'\' does not work properly; there is no way we can get a new-line
++	character with this rule.
++
++	This routine handles such C escape characters properly.
++	'''
++
++        c_escapes = {'n':'\n', 't':'\t', 'r':'\r'}
++        a = []
++        n = 0
++        for c in data:
++            if c == '\\':
++                n = n + 1
++            elif c in c_escapes.keys():
++                if n % 2 == 0:
++
++                    #
++                    # even number of slashes:
++                    #
++                    #    '\' '\' 'n' --> '\' 'n'
++                    #
++
++                    a.extend(['\\'] * (n/2))
++                    a.append(c)
++                    n = 0
++                else:
++
++                    #
++                    # odd number of slashes:
++                    #
++                    #    '\' '\' '\' 'n' --> '\' '\n'
++                    #
++
++                    a.extend(['\\'] * ((n - 1)/2))
++                    a.append(c_escapes[c])
++                    n = 0
++            else:
++                a.append(c)
++                n = 0
++
++        return ''.join(a)
++
++
+     def __strip(self, data):
+         """ returns a python string, chops of quotes.
+         inverse of escape"""
+-        data = data.replace("\\\\", "\\")
++        data = self.__strip_c_escapes(data)        
++        #data = data.replace("\\\\", "\\")
+         data = data.replace("\'", "'")
+         data = data.replace("\\\"", "\"")
+         return data[1:-1]
+@@ -171,7 +221,6 @@
+ 
+ 
+ 
+-
+ # everything below is kind of pointless but required by DB API
+ Date = datetime.date
+ Time = datetime.time
