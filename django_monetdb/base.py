@@ -42,7 +42,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if settings.DATABASE_PASSWORD:
                 kwargs['password'] = settings.DATABASE_PASSWORD
             self.connection = Database.connect(**kwargs)
-        return self.connection.cursor()
+
+        c =  self.connection.cursor()
+
+	#
+	# fetch more rows at once, makes things faster (useable, actually)
+	#
+
+	c.arraysize = 1000
+
+        return c
 
 class DatabaseFeatures(BaseDatabaseFeatures):
 
