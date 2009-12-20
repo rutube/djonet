@@ -201,6 +201,25 @@ class TestMonetDjango(unittest.TestCase):
 		except Aunt.DoesNotExist:
 			ok = True
 		self.failIf(not ok, "delete did not cascade");
-	
+
+	def testutf8(self):
+		'''test that we can save and retrieve utf-8 characters.
+
+		This was an attempt to duplicate a problem I hit with a real Django app;
+		this test passed though, so I didn't capture the issue properly.
+		'''
+
+		from testapp.models import Simple, Parent, Aunt, GrandParent
+		from django.core.management import call_command
+
+		call_command('syncdb')
+
+		cafe  = u"caf" + unichr(0x00E9)
+
+		print "cafe=", cafe.encode('utf8')
+		
+		s = Simple(name=cafe)
+		self.failUnless(s.name == cafe)
+
 if __name__ == '__main__':
 	unittest.main()
