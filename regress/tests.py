@@ -214,20 +214,28 @@ class TestMonetDjango(unittest.TestCase):
 
 		call_command('syncdb')
 
+		#
+		# cafe is in unicode here.
+		#
+
 		cafe  = u"caf" + unichr(0x00E9)
 
 		print "cafe=", cafe.encode('utf8')
 		
 		s = Simple(name=cafe)
+		s.save()
 
+		#
+		# At this point, string should be in database as UTF-8.
+		# When we retrieve it through Django, it should be
+		# back to unicode.
 		#
 		#	Note:
 		#  		unicode(s) calls s.__unicode__()
 		#
-		# unicode should not return a string that is encoded as UTF8
-		#
 
-		self.failIf(unicode(s) == cafe.encode('utf8'))
+		s1 = Simple.objects.get(pk=1)
+		self.failIf(s1.name == cafe.encode('utf8'))
 
 if __name__ == '__main__':
 	unittest.main()
