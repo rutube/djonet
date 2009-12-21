@@ -57,6 +57,11 @@ class DatabaseOperations(BaseDatabaseOperations):
 
 		return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
+    def start_transaction_sql(self):
+        '''MonetDB uses START TRANSACTION;, not BEGIN; the Django default'''
+
+        return 'START TRANSACTION;'
+
 #
 #	def date_trunc_sql(self, lookup_type, field_name):
 #		fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
