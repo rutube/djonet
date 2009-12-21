@@ -1,3 +1,10 @@
+	To apply this patch, from root of Monetdb source tree,
+	execute the following commands:
+
+		$ cd clients/src/python/monetdb/sql
+		$ patch -p0 < monetdb.sql.converters.diff
+
+	
 --- /home/mark/converters.py.orig	2009-12-20 00:47:58.000000000 -0500
 +++ ./converters.py	2009-12-20 00:48:16.000000000 -0500
 @@ -42,8 +42,8 @@
