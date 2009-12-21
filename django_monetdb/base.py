@@ -41,6 +41,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 kwargs['database'] = settings.DATABASE_NAME
             if settings.DATABASE_PASSWORD:
                 kwargs['password'] = settings.DATABASE_PASSWORD
+
             self.connection = Database.connect(**kwargs)
 
         c =  self.connection.cursor()
