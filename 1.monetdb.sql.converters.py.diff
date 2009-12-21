@@ -2,7 +2,7 @@
 	execute the following commands:
 
 		$ cd clients/src/python/monetdb/sql
-		$ patch -p0 < monetdb.sql.converters.diff
+		$ patch -p0 < 1.monetdb.sql.converters.py.diff
 
 	
 --- converters.py.orig	2009-12-18 14:39:55.000000000 -0500
