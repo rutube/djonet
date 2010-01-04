@@ -54,6 +54,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         return c
 
+#    def _enter_transaction_management(self, managed):
+#        pass
+#
+#    def _leave_transaction_management(self, managed):
+#        pass
+
 class DatabaseFeatures(BaseDatabaseFeatures):
 
     #
