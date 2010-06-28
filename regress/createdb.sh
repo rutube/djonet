@@ -23,10 +23,11 @@ usage="usage: $0 <db> <user> <pass> <schema>"
 [ "x$2" = "x" ] && echo $usage && exit 1
 [ "x$3" = "x" ] && echo $usage && exit 1
 [ "x$4" = "x" ] && echo $usage && exit 1
-db=$1
-user=$2
-pass=$3
-schema=$4
+
+db=$1		# db     = 'testdjangodb1'
+user=$2		# user   = 'django1'
+pass=$3		# passwd = 'django1'
+schema=$4	# schema = 'django1'
 
 echo "(re)creating ${db} at ${host}"
 sudo monetdb stop ${db}
