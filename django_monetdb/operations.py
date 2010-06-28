@@ -26,15 +26,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 	'''
 
 	#
-	# Operators from Vikram's original driver that I couldn't get
-	# to work in MonetDB shell.  If needed, poke around MonetDB
-	# sources to find the SQL grammar--I think they use YACC.
-	#
-	#    'contains'		: 'LIKE BINARY %s',
-	#    'icontains'	: 'LIKE %s',
-	#    'regex'		: 'REGEXP BINARY %s',
-	#    'iregex'		: 'REGEXP %s',
-	#
 	# These ones don't look right ... startswith should end up as:
 	#
 	#		LIKE 'abc%'
@@ -43,10 +34,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 	#
 	#		LIKE %s%%
 	#
-	#    'startswith'	: 'LIKE %s',
 	#    'endswith'		: 'LIKE %s',
-	#    'istartswith'	: 'ILIKE %s',
 	#    'iendswith'	: 'ILIKE %s',
+	#    'iexact'		: 'ILIKE %s',
 	#
 
 	operators = {
@@ -55,7 +45,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 	    'lt'		: '<  %s',
 	    'lte'		: '<= %s',
 	    'exact'		: '=  %s',
-	    'iexact'		: 'ILIKE %s',
 	    'startswith'	: 'LIKE %s',
 	    'istartswith'	: 'ILIKE %s',
 	}
@@ -76,7 +65,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 		return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
 	def start_transaction_sql(self):
-		'''MonetDB uses START TRANSACTION;, not BEGIN; the Django default'''
+		'''MonetDB uses START TRANSACTION; not BEGIN;'''
 
 		return 'START TRANSACTION;'
 
