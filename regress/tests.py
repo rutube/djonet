@@ -254,5 +254,25 @@ class TestMonetDjango(unittest.TestCase):
 		self.assertEqual(type(django_cafe), type(unicode_cafe))
 		self.assertEqual(django_cafe, unicode_cafe)
 
+	def test_startswith(self):
+		from testapp.models import Simple
+		from django.core.management import call_command
+		from django.db.models import Count
+
+		call_command('syncdb')
+
+		names = (
+		    'startwith 1',
+		    'startwith 2',
+		    'startwith 12',
+		    )
+		for n in names:
+			s = Simple(name=n)
+			s.save()
+
+		qs = Simple.objects.filter(name__startswith='start')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(n, len(names))
+
 if __name__ == '__main__':
 	unittest.main()
