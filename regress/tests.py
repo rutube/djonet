@@ -290,5 +290,41 @@ class TestMonetDjango(unittest.TestCase):
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 0)
 
+	def test_istartswith(self):
+		from testapp.models import Simple
+		from django.core.management import call_command
+		from django.db.models import Count
+
+		call_command('syncdb')
+
+		names = (
+		    'Start 1',
+		    'Start 2',
+		    'Start 12',
+		    )
+		for n in names:
+			s = Simple(name=n)
+			s.save()
+
+		qs = Simple.objects.filter(name__startswith='start')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], len(names))
+
+		qs = Simple.objects.filter(name__startswith='start 1')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 2)
+
+		qs = Simple.objects.filter(name__startswith='start 12')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 1)
+
+		qs = Simple.objects.filter(name__startswith='start 3')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 0)
+
+		qs = Simple.objects.filter(name__startswith='tart 1')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 0)
+
 if __name__ == '__main__':
 	unittest.main()
