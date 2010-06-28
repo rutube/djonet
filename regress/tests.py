@@ -225,21 +225,12 @@ class TestMonetDjango(unittest.TestCase):
 		self.failIf(not ok, "delete did not cascade");
 
 	def testutf8(self):
-		'''test that we can save and retrieve utf-8 characters.
-
-		This was an attempt to duplicate a problem I hit with
-		a real Django app; this test passed though, so I didn't
-		capture the issue properly.
-		'''
+		'''utf-8 in, unicode out.'''
 
 		from testapp.models import Simple, Parent, Aunt, GrandParent
 		from django.core.management import call_command
 
 		call_command('syncdb')
-
-		#
-		# cafe is in unicode here.
-		#
 
 		unicode_cafe  = u"caf" + unichr(0x00E9)
 		utf8_cafe = unicode_cafe.encode('utf8')
@@ -250,14 +241,8 @@ class TestMonetDjango(unittest.TestCase):
 		s.save()
 
 		#
-		# At this point, string should be in database as UTF-8.
-		# When we retrieve it through Django, it should be
-		# back to unicode.
-		#
-		#	Note:
-		#  		unicode(s) calls s.__unicode__()
-		#
-
+		# When we retrieve object, name should now be unicode.
+		# 
 
 		o = Simple.objects.get(pk=1)
 		django_cafe = o.name
