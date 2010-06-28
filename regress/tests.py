@@ -272,7 +272,7 @@ class TestMonetDjango(unittest.TestCase):
 
 		qs = Simple.objects.filter(name__startswith='start')
 		q = qs.aggregate(n = Count('id'))
-		self.assertEqual(n, len(names))
+		self.assertEqual(q['n'], len(names))
 
 if __name__ == '__main__':
 	unittest.main()
