@@ -259,8 +259,11 @@ class TestMonetDjango(unittest.TestCase):
 		#
 
 
-		s1 = Simple.objects.get(pk=1)
-		self.failIf(s1.name == utf8_cafe)
+		o = Simple.objects.get(pk=1)
+		django_cafe = o.name
+
+		self.assertEqual(type(django_cafe), type(unicode_cafe))
+		self.assertEqual(s1.name, unicode_cafe)
 
 if __name__ == '__main__':
 	unittest.main()
