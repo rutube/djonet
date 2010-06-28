@@ -57,6 +57,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 	    'exact'		: '=  %s',
 	    'iexact'		: 'ILIKE %s',
 	    'startswith'	: 'LIKE %s',
+	    'istartswith'	: 'ILIKE %s',
 	}
 
 	def quote_name(self, name):
