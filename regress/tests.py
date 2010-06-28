@@ -56,11 +56,12 @@ def run(cmd):
 		if rc == 0:
 			pass	# normal
 		elif rc < 0:
-			emsg = "Child was terminated by signal %s" % (-rc,)
+			emsg = "%s, child terminated by signal %s" \
+			    % (cmd, -rc)
 		else:
-			emsg = "Child returned error code %s" % (rc,)
+			emsg = "%s, child returned error %s" % (cmd, rc)
 	except OSError, e:
-		ems = "Execution failed: %s" % (e,)
+		emsg = "%s, execution failed: %s" % (cdm, e)
 	if emsg:
 		raise SubprocessError(emsg)
 	
