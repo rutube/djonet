@@ -227,8 +227,9 @@ class TestMonetDjango(unittest.TestCase):
 	def testutf8(self):
 		'''test that we can save and retrieve utf-8 characters.
 
-		This was an attempt to duplicate a problem I hit with a real Django app;
-		this test passed though, so I didn't capture the issue properly.
+		This was an attempt to duplicate a problem I hit with
+		a real Django app; this test passed though, so I didn't
+		capture the issue properly.
 		'''
 
 		from testapp.models import Simple, Parent, Aunt, GrandParent
@@ -240,11 +241,12 @@ class TestMonetDjango(unittest.TestCase):
 		# cafe is in unicode here.
 		#
 
-		cafe  = u"caf" + unichr(0x00E9)
+		unicode_cafe  = u"caf" + unichr(0x00E9)
+		utf8_cafe = unicode_cafe.encode('utf8')
 
-		print "cafe=", cafe.encode('utf8')
+		print "cafe =", unicode_cafe.encode('utf8')
 		
-		s = Simple(name=cafe)
+		s = Simple(name=unicode_cafe)
 		s.save()
 
 		#
@@ -256,8 +258,9 @@ class TestMonetDjango(unittest.TestCase):
 		#  		unicode(s) calls s.__unicode__()
 		#
 
+
 		s1 = Simple.objects.get(pk=1)
-		self.failIf(s1.name == cafe.encode('utf8'))
+		self.failIf(s1.name == utf8_cafe)
 
 if __name__ == '__main__':
 	unittest.main()
