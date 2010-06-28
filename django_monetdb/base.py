@@ -15,20 +15,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     operators = DatabaseOperations.operators
 
-    def __init__(self, settings_dict):
-        super(DatabaseWrapper, self).__init__(settings_dict)
-
-        # `settings_dict` should be a dictionary containing keys such as
-        # DATABASE_NAME, DATABASE_USER, etc. It's called `settings_dict`
-        # instead of `settings` to disambiguate it from Django settings
-        # modules.
-        #self.connection = None
-        #self.queries = []
-        #self.settings_dict = settings_dict
+    def __init__(self, *args, **kwargs):
+        super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         self.features = DatabaseFeatures()
         self.ops = DatabaseOperations()
-        self.validation = BaseDatabaseValidation()
+        self.validation = BaseDatabaseValidation(self)
         self.introspection = DatabaseIntrospection(self)
         self.creation = DatabaseCreation(self)
 
