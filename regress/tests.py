@@ -262,9 +262,9 @@ class TestMonetDjango(unittest.TestCase):
 		call_command('syncdb')
 
 		names = (
-		    'startwith 1',
-		    'startwith 2',
-		    'startwith 12',
+		    'start 1',
+		    'start 2',
+		    'start 12',
 		    )
 		for n in names:
 			s = Simple(name=n)
@@ -273,6 +273,22 @@ class TestMonetDjango(unittest.TestCase):
 		qs = Simple.objects.filter(name__startswith='start')
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], len(names))
+
+		qs = Simple.objects.filter(name__startswith='start 1')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 2)
+
+		qs = Simple.objects.filter(name__startswith='start 12')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 1)
+
+		qs = Simple.objects.filter(name__startswith='start 3')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 0)
+
+		qs = Simple.objects.filter(name__startswith='tart 1')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 0)
 
 if __name__ == '__main__':
 	unittest.main()
