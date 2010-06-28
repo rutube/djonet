@@ -45,18 +45,24 @@ settings.configure(
 
 sys.path.append('..')
 
+class SubprocessError(Exception): pass
+
 def run(cmd):
 	'''Wrapper for subprocess.call that handles errors.'''
+
+	emsg = ''
 	try:
 		rc = subprocess.call(cmd, shell=True)
 		if rc == 0:
 			pass	# normal
 		elif rc < 0:
-			self.fail("Child was terminated by signal %s" % (-rc,))
+			emsg = "Child was terminated by signal %s" % (-rc,)
 		else:
-			self.fail("Child returned error code %s" % (rc,))
+			emsg = "Child returned error code %s" % (rc,)
 	except OSError, e:
-		self.fail("Execution failed:", e)
+		ems = "Execution failed: %s" % (e,)
+	if emsg:
+		raise SubprocessError(emsg)
 	
 
 class TestMonetDjango(unittest.TestCase):
