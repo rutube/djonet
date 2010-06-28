@@ -306,23 +306,23 @@ class TestMonetDjango(unittest.TestCase):
 			s = Simple(name=n)
 			s.save()
 
-		qs = Simple.objects.filter(name__startswith='start')
+		qs = Simple.objects.filter(name__istartswith='start')
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], len(names))
 
-		qs = Simple.objects.filter(name__startswith='start 1')
+		qs = Simple.objects.filter(name__istartswith='start 1')
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 2)
 
-		qs = Simple.objects.filter(name__startswith='start 12')
+		qs = Simple.objects.filter(name__istartswith='start 12')
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 1)
 
-		qs = Simple.objects.filter(name__startswith='start 3')
+		qs = Simple.objects.filter(name__istartswith='start 3')
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 0)
 
-		qs = Simple.objects.filter(name__startswith='tart 1')
+		qs = Simple.objects.filter(name__istartswith='tart 1')
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 0)
 
