@@ -265,6 +265,7 @@ class TestMonetDjango(unittest.TestCase):
 		    'start 1',
 		    'start 2',
 		    'start 12',
+		    'Start 12',
 		    )
 		for n in names:
 			s = Simple(name=n)
