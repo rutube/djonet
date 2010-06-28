@@ -327,5 +327,30 @@ class TestMonetDjango(unittest.TestCase):
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 0)
 
+	def test_endswith(self):
+		from testapp.models import Simple
+		from django.core.management import call_command
+		from django.db.models import Count
+
+		call_command('syncdb')
+
+		names = (
+		    'start 1',
+		    'start 2',
+		    'start 12',
+		    'Start 12',
+		    )
+		for n in names:
+			s = Simple(name=n)
+			s.save()
+
+		qs = Simple.objects.filter(name__endswith=' 12')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 2)
+
+		qs = Simple.objects.filter(name__endswith=' 1')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 1)
+
 if __name__ == '__main__':
 	unittest.main()
