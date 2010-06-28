@@ -79,8 +79,9 @@ class TestMonetDjango(unittest.TestCase):
 		from django.db import connection
 		connection.close()
 
-		cmd = './zapdb.sh "%s" "%s" "%s" "%s"' % \
-		    (db, user, passwd, schema)
+		# createdb.sh deletes b/f it creates.
+		#cmd = './zapdb.sh "%s" "%s" "%s" "%s"' % \
+		#    (db, user, passwd, schema)
 		#run(cmd)
 
 	def testinit(self):
@@ -124,19 +125,21 @@ class TestMonetDjango(unittest.TestCase):
 	def testsyncdb(self):
 		'''Does syncdb run (using models.py in the testapp subdir)?
 
-		Note that this does not actually test that fields are created,
-		just that syncdb command exits without error.  For example, 
-		while developing this driver I noticed that the FloatField was
-		not actually created, although syncdb completed.
+		Note that this does not actually test that fields are
+		created, just that syncdb command exits without error.
+		For example, while developing this driver I noticed
+		that the FloatField was not actually created, although
+		syncdb completed.
 
-		As a workaround for this particular issue, I used a float field 
-		in the unique_together section of the Meta subclass.  But that's
-		a one-off test hack; to really test, I should get a model instance
-		and verify it's attributes match what was inserted into the db.
+		As a workaround for this particular issue, I used a float
+		field in the unique_together section of the Meta subclass.
+		But that's a one-off test hack; to really test, I should
+		get a model instance and verify it's attributes match
+		what was inserted into the db.
 
-		The core issue is that if db_type() returns None, the field is 
-		skipped.   And db_type() can return none if you have an error
-		in your driver's data_type dictionary.
+		The core issue is that if db_type() returns None, the
+		field is skipped.   And db_type() can return none if
+		you have an error in your driver's data_type dictionary.
 		'''
 
 		from django.core.management import call_command
@@ -200,7 +203,8 @@ class TestMonetDjango(unittest.TestCase):
 		s.delete()
 
 		#
-		# Parent, Aunt and GrandParent records should now be gone from database.
+		# Parent, Aunt and GrandParent records should now be
+		# gone from database.
 		#
 
 		ok = False
