@@ -263,7 +263,7 @@ class TestMonetDjango(unittest.TestCase):
 		django_cafe = o.name
 
 		self.assertEqual(type(django_cafe), type(unicode_cafe))
-		self.assertEqual(s1.name, unicode_cafe)
+		self.assertEqual(django_cafe, unicode_cafe)
 
 if __name__ == '__main__':
 	unittest.main()

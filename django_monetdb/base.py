@@ -49,6 +49,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 kwargs['database'] = settings.DATABASE_NAME
             if settings.DATABASE_PASSWORD:
                 kwargs['password'] = settings.DATABASE_PASSWORD
+            # Force strings to always come back as unicode.
+            kwargs['use_unicode'] = True
 
             self.connection = Database.connect(**kwargs)
 
