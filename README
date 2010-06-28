@@ -6,6 +6,6 @@ December 2009
 	features as needed.  Look at regress/tests.py to see
 	what works.
 
-	Built using Django 1.1-beta1 and MonetDB CVS head.
+	Built using Django 1.2 and MonetDB Feb2010-SP2.
 
 	Status: testing.  
