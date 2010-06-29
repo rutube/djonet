@@ -26,14 +26,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 	'''
 
 	#
-	# These ones don't look right ... startswith should end up as:
-	#
-	#		LIKE 'abc%'
-	#
-	# so shouldn't it be something like this?
-	#
-	#		LIKE %s%%
-	#
 	#    'endswith'		: 'LIKE %s',
 	#    'iendswith'	: 'ILIKE %s',
 	#    'iexact'		: 'ILIKE %s',
@@ -65,7 +57,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 		return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
 	def start_transaction_sql(self):
-		'''MonetDB uses START TRANSACTION; not BEGIN;'''
+		'''MonetDB uses START TRANSACTION not BEGIN.'''
 
 		return 'START TRANSACTION;'
 
