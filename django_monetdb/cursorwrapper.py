@@ -4,17 +4,6 @@ Cursor hack so we can handle special Django types.
 
 from django.utils.safestring import SafeString, SafeUnicode
 
-#import sys
-
-#from django.db import utils
-#from django.db.backends import *
-from django.db.backends.signals import connection_created
-#from django.db.backends.postgresql.client import DatabaseClient
-#from django.db.backends.postgresql.creation import DatabaseCreation
-#from django.db.backends.postgresql.introspection import DatabaseIntrospection
-#from django.db.backends.postgresql.operations import DatabaseOperations
-#from django.db.backends.postgresql.version import get_version
-
 class CursorWrapper(object):
     """
     A thin wrapper around MonetDB cursors that allows them to accept
