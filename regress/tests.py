@@ -341,5 +341,28 @@ class TestMonetDjango(unittest.TestCase):
 		s = Simple(name=n)
 		s.save()
 
+	def test_autocommit_on_by_default(self):
+		'''Django's default behavior is auto commit.'''
+
+		from testapp.models import Simple
+		from django.core.management import call_command
+		from django.utils.safestring import SafeUnicode
+
+		from monetdb.monetdb_exceptions import OperationalError
+
+		call_command('syncdb')
+
+		s = Simple(name='mark')
+		s.save()
+		s = Simple(name='mark')
+		try:
+			s.save()
+		except OperationalError:
+			pass
+
+		# first one should be saved.
+		s = Simple.objects.get(name='mark')
+		self.assertTrue(a is not None)
+
 if __name__ == '__main__':
 	unittest.main()
