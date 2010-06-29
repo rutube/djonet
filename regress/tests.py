@@ -327,5 +327,19 @@ class TestMonetDjango(unittest.TestCase):
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 0)
 
+	def test_safeunicode(self):
+		'''Slug fields have type SafeUnicode, we need to support
+		this field type.'''
+
+		from testapp.models import Simple
+		from django.core.management import call_command
+		from django.utils.safestring import SafeUnicode
+
+		call_command('syncdb')
+
+		n = SafeUnicode('a name')
+		s = Simple(name=n)
+		s.save()
+
 if __name__ == '__main__':
 	unittest.main()
