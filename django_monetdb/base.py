@@ -19,6 +19,7 @@ from django.conf import settings
 
 import monetdb.sql as Database
 
+from django_monetdb.cursorwrapper import CursorWrapper
 from django_monetdb.introspection import DatabaseIntrospection
 from django_monetdb.creation import DatabaseCreation
 from django_monetdb.operations import DatabaseOperations
@@ -62,7 +63,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
 	c.arraysize = 1000
 
-        return c
+        #return c
+	return CursorWrapper(c)
 
 #    def _enter_transaction_management(self, managed):
 #        pass
