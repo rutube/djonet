@@ -341,28 +341,50 @@ class TestMonetDjango(unittest.TestCase):
 		s = Simple(name=n)
 		s.save()
 
-	def test_autocommit_on_by_default(self):
-		'''Django's default behavior is auto commit.'''
+	def test_autocommit_like_behavior(self):
+		'''Django's default behavior is "like" auto commit.
+
+		From Django docs, "Managing database transactions":
+
+		    Django's default behavior is to run with an open
+		    transaction which it commits automatically when any
+		    built-in, data-altering model function is called. For
+		    example, if you call model.save() or model.delete(),
+		    the change will be committed immediately.
+
+		    This is much like the auto-commit setting for most
+		    databases.
+
+		Note the "much like" phrase.  Initially, I thought they
+		meant you should turn on autocommit on the database
+		connection, but that didn't work.  They mean that
+		internally Django has code to mimic autocommit.
+		'''
 
 		from testapp.models import Simple
 		from django.core.management import call_command
-		from django.utils.safestring import SafeUnicode
+		from django.core.validators import ValidationError
+		import django
 
-		from monetdb.monetdb_exceptions import OperationalError
-
+		# full_clean() (used by this test) is new to Django 1.2
+		maj = django.VERSION[0]
+		min = django.VERSION[1]
+		self.assertTrue(maj > 1 or (maj == 1 and min >= 2))
+		
 		call_command('syncdb')
 
 		s = Simple(name='mark')
 		s.save()
 		s = Simple(name='mark')
 		try:
+			s.full_clean()	
 			s.save()
-		except OperationalError:
+		except ValidationError:
 			pass
 
 		# first one should be saved.
 		s = Simple.objects.get(name='mark')
-		self.assertTrue(a is not None)
+		self.assertTrue(s is not None)
 
 if __name__ == '__main__':
 	unittest.main()
