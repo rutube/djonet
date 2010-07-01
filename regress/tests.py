@@ -386,5 +386,29 @@ class TestMonetDjango(unittest.TestCase):
 		s = Simple.objects.get(name='mark')
 		self.assertTrue(s is not None)
 
+	def test_loadfixture(self):
+		'''Update sequence nextval's when a fixture is loaded.
+
+		Note: Here's a great set of fixture unit tests:
+
+		http://django-pyodbc.googlecode.com/svn/trunk/tests/fixtures/models.py
+		'''
+
+		from testapp.models import Simple
+		from django.core import management
+		from django.db.models import Count
+
+		management.call_command('syncdb')
+		management.call_command('loaddata', 'fixture1', verbosity=0)
+
+		# Fixture should have loaded Two records.
+		qs = Simple.objects.all()
+		d = qs.aggregate(n = Count('id'))
+		self.assertEqual(d['n'], 2)
+
+		# We should be able to save a new record.
+		s = Simple(name = 'abc xyz')
+		s.save()
+
 if __name__ == '__main__':
 	unittest.main()
