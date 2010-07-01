@@ -50,6 +50,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 kwargs['database'] = settings.DATABASE_NAME
             if settings.DATABASE_PASSWORD:
                 kwargs['password'] = settings.DATABASE_PASSWORD
+
             # Force strings to always come back as unicode.
             kwargs['use_unicode'] = True
 
@@ -63,7 +64,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
 	c.arraysize = 1000
 
-        #return c
 	return CursorWrapper(c)
 
 #    def _enter_transaction_management(self, managed):
