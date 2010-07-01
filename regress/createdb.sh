@@ -74,15 +74,11 @@ CREATE SCHEMA "${schema}" AUTHORIZATION "${user}";
 ALTER USER "${user}" SET SCHEMA "${schema}";
 
 --
--- 	Note:
---
---	By default, MonetDB gives users select permission on the 
---	tables view in the sys schema.	So we don't need to issue
---	a grant statment like this:
---
---		GRANT select on tables to ${user};
+-- Permissions so we can figure out what sequence a table uses.
 -- 
 
+grant select on table tables to ${user};
+grant select on table columns to ${user};
 EOF
 mclient -d ${db} < t1.sql
 

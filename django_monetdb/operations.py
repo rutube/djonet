@@ -61,6 +61,73 @@ class DatabaseOperations(BaseDatabaseOperations):
 
 		return 'START TRANSACTION;'
 
+	def model_to_sequencesql(self, m):
+		'''Make the SQL statement that updates the tables primary
+		key sequence.  Return empty string if no SQL needed.
+		'''
+
+		from django.db import connection
+
+		# tbl has app_label prefix; e.g., testapp_simple
+		tbl = m._meta.db_table
+
+		# Get name of sequence for this table.  Here's
+		# a trace from doing it manually.
+		#
+		#     sql>  select "default" from sys.columns 
+		#     more> where table_id = 4186 and name = 'id';
+		#     +-------------------------------------+
+		#     | default                             |
+		#     +=====================================+
+		#     | next value for "django1"."seq_4176" |
+		#     +-------------------------------------+
+		#     1 tuple
+		#     sql>
+		#
+
+		c = connection.cursor()
+		fmt = '''
+SELECT 
+  "default" 
+FROM 
+  sys.columns 
+WHERE 
+  table_id = (SELECT id FROM sys.tables where name = %s) AND
+  name = 'id'
+;
+'''
+		c.execute(fmt, [tbl,])
+		row = c.fetchone()
+		# default = 'next value for "django1"."seq_4176"'
+		default = row[0]
+		p = default.rfind('"."seq_')
+		if p == -1:
+			return ''
+
+		# seq = '"seq_4176"'
+		seq = default[p + 2:]
+
+		fmt = 'ALTER SEQUENCE %s RESTART WITH (SELECT MAX(id) + 1 FROM %s);'
+
+		return fmt % (seq, tbl)
+
+	def sequence_reset_sql(self, style, model_list):
+		'''Return list of sequence update SQL for given models.
+
+		Style is how to color the output for a terminal??!!'''
+
+		from django.db import models
+
+		fmt = "ALTER SEQUENCE %s RESTART WITH (SELECT MAX(id) + 1 FROM %s);"
+
+		rval = []
+		for model in model_list:
+			sql = self.model_to_sequencesql(model)
+			if sql:
+				rval.append(sql)
+		return rval
+
+
 #
 #	def date_trunc_sql(self, lookup_type, field_name):
 #		fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
