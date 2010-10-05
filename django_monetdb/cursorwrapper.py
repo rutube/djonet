@@ -56,8 +56,9 @@ class CursorWrapper(object):
 
     def execute(self, sql, params=()):
 	newparams = self.__handle_custom_types(params)
-	#import sys
-	#print >> sys.stderr, "sql =", sql, "newparams =", newparams
+	# next two for debugging.
+	import syslog
+	syslog.syslog("sql = %s, newparams = %s" % (sql,  newparams))
         return self.cursor.execute(sql, newparams)
 
     def executemany(self, sql, params):
