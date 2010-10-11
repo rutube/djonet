@@ -429,7 +429,7 @@ class TestMonetDjango(unittest.TestCase):
 
 		iexact_matches_n = len(names) - 2
 
-		qs = Simple.objects.filter(name__iexact='start')
+		qs = Simple.objects.filter(name__iexact='iExactly this')
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], iexact_matches_n)
 
