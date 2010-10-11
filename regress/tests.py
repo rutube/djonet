@@ -410,5 +410,29 @@ class TestMonetDjango(unittest.TestCase):
 		s = Simple(name = 'abc xyz')
 		s.save()
 
+	def test_iexact(self):
+		from testapp.models import Simple
+		from django.core.management import call_command
+		from django.db.models import Count
+
+		call_command('syncdb')
+
+		names = (
+		    'iExactly this',
+		    'iExactly This',
+		    'iExactly This not',
+		    'not iExactly This',
+		    )
+		for n in names:
+			s = Simple(name=n)
+			s.save()
+
+		iexact_matches_n = len(names) - 2
+
+		qs = Simple.objects.filter(name__iexact='start')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], iexact_matches_n)
+
+
 if __name__ == '__main__':
 	unittest.main()
