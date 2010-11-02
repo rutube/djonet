@@ -336,7 +336,7 @@ class TestMonetDjango(unittest.TestCase):
 
 		names = (
 		    'Start 1',
-		    '2 Start ',
+		    '2 Start',
 		    'Art 2',
 		    '123 ART',
 		    )
@@ -354,7 +354,7 @@ class TestMonetDjango(unittest.TestCase):
 
 		qs = Simple.objects.filter(name__icontains='art ')
 		q = qs.aggregate(n = Count('id'))
-		self.assertEqual(q['n'], 1)
+		self.assertEqual(q['n'], 2)
 
 
 	def test_safeunicode(self):

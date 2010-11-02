@@ -40,6 +40,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 	    'startswith'	: 'LIKE %s',
 	    'istartswith'	: 'ILIKE %s',
 	    'iexact'		: 'ILIKE %s',
+	    'icontains'		: 'ILIKE %s',
 	}
 
 	def quote_name(self, name):
