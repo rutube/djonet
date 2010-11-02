@@ -327,6 +327,36 @@ class TestMonetDjango(unittest.TestCase):
 		q = qs.aggregate(n = Count('id'))
 		self.assertEqual(q['n'], 0)
 
+	def test_icontains(self):
+		from testapp.models import Simple
+		from django.core.management import call_command
+		from django.db.models import Count
+
+		call_command('syncdb')
+
+		names = (
+		    'Start 1',
+		    '2 Start ',
+		    'Art 2',
+		    '123 ART',
+		    )
+		for n in names:
+			s = Simple(name=n)
+			s.save()
+
+		qs = Simple.objects.filter(name__icontains='art')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], len(names))
+
+		qs = Simple.objects.filter(name__icontains='start')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 2)
+
+		qs = Simple.objects.filter(name__icontains='art ')
+		q = qs.aggregate(n = Count('id'))
+		self.assertEqual(q['n'], 1)
+
+
 	def test_safeunicode(self):
 		'''Slug fields have type SafeUnicode, we need to support
 		this field type.'''
