@@ -19,85 +19,45 @@ from django.conf import settings
 
 import monetdb.sql as Database
 
-from django_monetdb.cursorwrapper import CursorWrapper
-from django_monetdb.introspection import DatabaseIntrospection
-from django_monetdb.creation import DatabaseCreation
-from django_monetdb.operations import DatabaseOperations
+from djonet.cursorwrapper import CursorWrapper
+from djonet.introspection import DatabaseIntrospection
+from djonet.creation import DatabaseCreation
+from djonet.operations import DatabaseOperations
+from djonet.features import DatabaseFeatures
+from djonet.validation import DatabaseValidation
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-    '''A database connection.'''
-
     operators = DatabaseOperations.operators
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        self.features = DatabaseFeatures()
-        self.ops = DatabaseOperations()
-        self.validation = BaseDatabaseValidation(self)
+        self.features = DatabaseFeatures(self)
+        self.ops = DatabaseOperations(self)
+        self.validation = DatabaseValidation(self)
         self.introspection = DatabaseIntrospection(self)
         self.creation = DatabaseCreation(self)
 
     def _cursor(self):
-	kwargs = {}
+        settings_dict = self.settings_dict
+        kwargs = {'use_unicode': True}
         if not self.connection:
-            if settings.DATABASE_USER:
-                kwargs['username'] = settings.DATABASE_USER
-            if settings.DATABASE_NAME:
-                kwargs['database'] = settings.DATABASE_NAME
-            if settings.DATABASE_PASSWORD:
-                kwargs['password'] = settings.DATABASE_PASSWORD
-
-            # Force strings to always come back as unicode.
-            kwargs['use_unicode'] = True
+            if settings_dict['USER']:
+                kwargs['username'] = settings_dict['USER']
+            if settings_dict['NAME']:
+                kwargs['database'] = settings_dict['NAME']
+            if settings_dict['PASSWORD']:
+                kwargs['password'] = settings_dict['PASSWORD']
+            if settings_dict['HOST']:
+                kwargs['hostname'] = settings_dict['HOST']
+            if settings_dict['PORT']:
+                kwargs['port'] = int(settings_dict['PORT'])
 
             self.connection = Database.connect(**kwargs)
 
-        c =  self.connection.cursor()
-
-	#
-	# fetch more rows at once, makes things faster (useable, actually)
-	#
-
-	c.arraysize = 1000
-
-	return CursorWrapper(c)
-
-#    def _enter_transaction_management(self, managed):
-#        pass
-#
-#    def _leave_transaction_management(self, managed):
-#        pass
-
-class DatabaseFeatures(BaseDatabaseFeatures):
-
-    #
-    # I'm not sure about this one.  If MonetDB can select from a table
-    # it's updating, then we can leave this as the default of True.
-    # Setting it to False is slower but will always work.  See
-    # Django's source file db/models/sql/subqueries.py for the only place
-    # this is used.
-    #
-
-    update_can_self_select = False
-
-    #
-    # Again, I'm not sure about this, so I'll use the more conservative
-    # settings.
-    #
-    # Here's a relevant comment from the only file that uses this setting:
-    # db/models/fields/related.py:
-    #
-    #     The database column type of a ForeignKey is the column type
-    #     of the field to which it points. An exception is if the
-    #     ForeignKey points to an AutoField / PositiveIntegerField /
-    #     PositiveSmallIntegerField, in which case the column type
-    #     is simply that of an IntegerField.  If the database needs
-    #     similar types for key fields however, the only thing we can
-    #     do is making AutoField an IntegerField.
-    #
-
-    related_fields_match_type = False
+        cursor = self.connection.cursor()
+        cursor.arraysize = 1000
+    	return CursorWrapper(cursor)
