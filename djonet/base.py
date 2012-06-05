@@ -45,16 +45,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         settings_dict = self.settings_dict
         kwargs = {'use_unicode': True}
         if not self.connection:
-            if settings_dict['USER']:
+            if settings_dict.has_key('USER'):
                 kwargs['username'] = settings_dict['USER']
-            if settings_dict['NAME']:
+            if settings_dict.has_key('NAME'):
                 kwargs['database'] = settings_dict['NAME']
-            if settings_dict['PASSWORD']:
+            if settings_dict.has_key('PASSWORD'):
                 kwargs['password'] = settings_dict['PASSWORD']
-            if settings_dict['HOST']:
+            if settings_dict.has_key('HOST'):
                 kwargs['hostname'] = settings_dict['HOST']
-            if settings_dict['PORT']:
-                kwargs['port'] = int(settings_dict['PORT'])
+            if settings_dict.has_key('PORT'):
+                if settings_dict['PORT'].isdigit():
+                    kwargs['port'] = int(settings_dict['PORT'])
 
             self.connection = Database.connect(**kwargs)
 
