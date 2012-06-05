@@ -26,3 +26,7 @@ put something like this in your Django *settings.py*::
      }
  }
 
+About
+=====
+ * http://www.monetdb.org/
+
