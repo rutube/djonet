@@ -32,5 +32,5 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
 	def get_table_list(self, cursor):
 		'''Return a list of table names in the current database.'''
-		cursor.execute("select name from sys.tables;")
+		cursor.execute("SELECT name FROM sys.tables WHERE NOT system;")
 		return [row[0] for row in cursor.fetchall()]
