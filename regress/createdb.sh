@@ -1,4 +1,4 @@
-#! /bin/sh -e
+#! /bin/bash
 #
 # Create MonetDB database.  Destroys any data in that db.
 #
@@ -29,15 +29,11 @@ user=$2		# 'django1'
 pass=$3		# 'django1'
 schema=$4	# 'django1'
 
-# XXX: make a script argument like other params.
-# The user that runs merovingian
-merouser=mero
-
 echo "(re)creating ${db} at ${host}"
-sudo su - $merouser -c "monetdb stop ${db}"
-sudo su - $merouser -c "monetdb destroy -f ${db}"
-sudo su - $merouser -c "monetdb create ${db}" || exit 1
-sudo su - $merouser -c "monetdb start ${db}" || exit 1
+monetdb stop ${db}
+monetdb destroy -f ${db}
+monetdb create ${db} || exit 1
+monetdb start ${db} || exit 1
 
 #
 # I couldn't set password on command-line, despite what mclient man
@@ -86,7 +82,7 @@ mclient -d ${db} < t1.sql
 # Release, so the test user can log in to the test database.
 #
 
-sudo su - $merouser -c "monetdb release ${db}"
+monetdb release ${db}
 
 rm ${DOTMONETDBFILE}
 rm t1.sql

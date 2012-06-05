@@ -1,4 +1,4 @@
-#! /bin/sh -e
+#! /bin/bash
 #
 # Delete MonetDB database.
 #
@@ -14,11 +14,7 @@ user=$2
 pass=$3
 schema=$4
 
-# XXX: make a script argument like other params.
-# The user that runs merovingian
-merouser=mero
-
 echo "Stopping ${db} ..."
-sudo su - $merouser -c "monetdb stop ${db}"
+monetdb stop ${db}
 echo "Destroying ${db} ..."
-sudo su - $merouser -c "monetdb destroy -f ${db}"
+monetdb destroy -f ${db}

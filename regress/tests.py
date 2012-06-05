@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2009 - 2010, Mark Bucciarelli <mkbucc@gmail.com>
 # 
 # Permission to use, copy, modify, and/or distribute this software for any
@@ -30,17 +31,22 @@ passwd = 'django1'
 
 settings.configure(
     DEBUG=True,
-    DATABASE_ENGINE='django_monetdb',
-    DATABASE_NAME=db,
-    DATABASE_USER=user,
-    DATABASE_PASSWORD=passwd,
+    DATABASES = {
+        'default': {
+            'ENGINE': 'djonet',
+            'NAME': db,
+            'USER': user,
+            'PASSWORD': passwd,
+        }
+    },
     INSTALLED_APPS = ('testapp',),
 )
+
 
 #
 # In order for Django to find our driver for the unit tests, the parent
 # directory of the source must be on the system path, as Django tries
-# to import the module django_monetdb.base.
+# to import the module djonet.base.
 #
 
 sys.path.append('..')
@@ -86,13 +92,13 @@ class TestMonetDjango(unittest.TestCase):
 
 	def testinit(self):
 		'''instantiate our custom database wrapper.'''
-		from django_monetdb.base import DatabaseWrapper
+		from djonet.base import DatabaseWrapper
 		db = DatabaseWrapper({})
 
 	def testcreate(self):
 		'''instantiate a cursor.'''
-		import django_monetdb
-		w = django_monetdb.base.DatabaseWrapper({})
+		import djonet
+		w = djonet.base.DatabaseWrapper({})
 		c = w.cursor()
 		self.failUnless(c)
 
