@@ -42,4 +42,4 @@ class DatabaseClient(BaseDatabaseClient):
         if db:
             args += [db]
 
-        os.execvp('monet', args)
+        os.execvp('monetdb', args)
