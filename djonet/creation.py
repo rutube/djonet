@@ -49,6 +49,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'FloatField'		: 'float',
         'IntegerField'		: 'int',
         'IPAddressField'		: 'char(15)',
+        'GenericIPAddressField': 'char(39)',
         'NullBooleanField'		: 'boolean',
         'OneToOneField'		: 'int',
         'PositiveIntegerField'	: 'int',
