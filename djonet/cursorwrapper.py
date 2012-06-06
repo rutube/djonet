@@ -48,19 +48,16 @@ class CursorWrapper(object):
                    newparams.append(v)
             return newparams
         elif isinstance(params, SafeUnicode):
-		return unicode(params)
+		    return unicode(params)
         elif isinstance(params, SafeString):
-		return str(params)
+		    return str(params)
         else:
             return params
 
     def execute(self, sql, params=()):
-	newparams = self.__handle_custom_types(params)
-	# next two for debugging.
-	import syslog
-	syslog.syslog("sql = %s, newparams = %s" % (sql,  newparams))
+        newparams = self.__handle_custom_types(params)
         return self.cursor.execute(sql, newparams)
 
     def executemany(self, sql, params):
-	newparams = self.__handle_custom_types(params)
+        newparams = self.__handle_custom_types(params)
         return self.cursor.execute(sql, newparams)
