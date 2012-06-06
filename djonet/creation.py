@@ -93,11 +93,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                     if verbosity >= 1:
                         print ("Destroying old test database '%s'..."
                                % self.connection.alias)
-                    errorcode = subprocess.check_call(["monetdb", "destroy", "-f", test_database_name])
-                    if not errorcode:
-                        create_monet_db()
-                    else:
-                        raise Exception("can't destroy database")
+                    subprocess.check_call(["monetdb", "stop", test_database_name])
+                    subprocess.check_call(["monetdb", "destroy", "-f", test_database_name])
+                    create_monet_db()
                 except Exception, e:
                     sys.stderr.write(
                         "Got an error recreating the test database: %s\n" % e)
