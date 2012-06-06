@@ -170,11 +170,7 @@ WHERE
 #        # 2**64 - 1, as recommended by the MySQL documentation
 #        return 18446744073709551615L
 #
-#    def quote_name(self, name):
-#        if name.startswith('"') and name.endswith('"'):
-#            return name # Quoting once is enough.
-#        return name
-#        #return '"%s"' % name
+
 #
 #    def random_function_sql(self):
 #        return 'RAND()'
