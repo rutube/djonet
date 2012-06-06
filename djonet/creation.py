@@ -13,45 +13,97 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
- 
+
+import subprocess
+import sys
+
 #from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
 
 class DatabaseCreation(BaseDatabaseCreation):
 
-	#
-	# XXX: I didn't see where to define the max int values that fit
-	# XXX: in the int fields.  The Positive* variants will hold less
-	# XXX: than expected, as they use same type as the non-Positive* 
-	# XXX: ones.
-	#
+    #
+    # XXX: I didn't see where to define the max int values that fit
+    # XXX: in the int fields.  The Positive* variants will hold less
+    # XXX: than expected, as they use same type as the non-Positive*
+    # XXX: ones.
+    #
 
-	#
-	# Careful with things like %(max_digits)s.  If Django does not
-	# require the property, then db_type() will return None (as
-	# there will be a key error with the data dictionary, and the
-	# field will not be added to the database table!
-	#
+    #
+    # Careful with things like %(max_digits)s.  If Django does not
+    # require the property, then db_type() will return None (as
+    # there will be a key error with the data dictionary, and the
+    # field will not be added to the database table!
+    #
 
-	data_types = {
-	    'AutoField'			: 'int AUTO_INCREMENT',
-	    'BooleanField'		: 'boolean',
-	    'CharField'			: 'varchar(%(max_length)s)',
-	    'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-	    'DateField'			: 'date',
-	    'DateTimeField'		: 'timestamp',
-	    'DecimalField'		: 'numeric(%(max_digits)s, %(decimal_places)s)',
-	    'FileField'			: 'varchar(%(max_length)s)',
-	    'FilePathField'		: 'varchar(%(max_length)s)',
-	    'FloatField'		: 'float',
-	    'IntegerField'		: 'int',
-	    'IPAddressField'		: 'char(15)',
-	    'NullBooleanField'		: 'boolean',
-	    'OneToOneField'		: 'int',
-	    'PositiveIntegerField'	: 'int',
-	    'PositiveSmallIntegerField'	: 'smallint',
-	    'SlugField'			: 'varchar(%(max_length)s)',
-	    'SmallIntegerField'		: 'smallint',
-	    'TextField'			: 'clob',
-	    'TimeField'			: 'time',
-	}
+    data_types = {
+        'AutoField'			: 'int AUTO_INCREMENT',
+        'BooleanField'		: 'boolean',
+        'CharField'			: 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField'			: 'date',
+        'DateTimeField'		: 'timestamp',
+        'DecimalField'		: 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'FileField'			: 'varchar(%(max_length)s)',
+        'FilePathField'		: 'varchar(%(max_length)s)',
+        'FloatField'		: 'float',
+        'IntegerField'		: 'int',
+        'IPAddressField'		: 'char(15)',
+        'NullBooleanField'		: 'boolean',
+        'OneToOneField'		: 'int',
+        'PositiveIntegerField'	: 'int',
+        'PositiveSmallIntegerField'	: 'smallint',
+        'SlugField'			: 'varchar(%(max_length)s)',
+        'SmallIntegerField'		: 'smallint',
+        'TextField'			: 'clob',
+        'TimeField'			: 'time',
+    }
+
+    def _create_test_db(self, verbosity, autoclobber):
+        """
+        Internal implementation - creates the test db tables.
+        """
+        test_database_name = self._get_test_db_name()
+
+        def create_monet_db():
+            errorcode = subprocess.check_call(["monetdb", "create", test_database_name])
+            if not errorcode:
+                errorcode = subprocess.check_call(["monetdb", "release", test_database_name])
+            if not errorcode:
+                errorcode = subprocess.check_call(["monetdb", "start", test_database_name])
+            return errorcode
+
+        try:
+            create_monet_db()
+        except OSError, e:
+            sys.stderr.write(
+                "Can't find monetdb, make sure it is installed and in your PATH: %s\n" % e)
+            import os
+            sys.stderr.write(os.environ['PATH'])
+            sys.exit(2)
+        except subprocess.CalledProcessError, e:
+            sys.stderr.write(
+                "Got an error creating the test database: %s\n" % e)
+            if not autoclobber:
+                confirm = raw_input(
+                    "Type 'yes' if you would like to try deleting the test "
+                    "database '%s', or 'no' to cancel: " % test_database_name)
+            if autoclobber or confirm == 'yes':
+                try:
+                    if verbosity >= 1:
+                        print ("Destroying old test database '%s'..."
+                               % self.connection.alias)
+                    errorcode = subprocess.check_call(["monetdb", "destroy", "-f", test_database_name])
+                    if not errorcode:
+                        create_monet_db()
+                    else:
+                        raise Exception("can't destroy database")
+                except Exception, e:
+                    sys.stderr.write(
+                        "Got an error recreating the test database: %s\n" % e)
+                    sys.exit(2)
+            else:
+                print "Tests cancelled."
+                sys.exit(1)
+
+        return test_database_name
