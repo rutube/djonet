@@ -9,7 +9,7 @@ run from the source folder::
 
 or make sure the Djonet source directory is in your *PYTHONPATH*.
 
-Djonet is also installable with pip:
+Djonet is also installable with pip::
 
  $ pip install djonet
 
