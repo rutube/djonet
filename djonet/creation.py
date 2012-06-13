@@ -90,11 +90,14 @@ class DatabaseCreation(BaseDatabaseCreation):
                     "Type 'yes' if you would like to try deleting the test "
                     "database '%s', or 'no' to cancel: " % test_database_name)
             if autoclobber or confirm == 'yes':
+                if verbosity >= 1:
+                    print ("Destroying old test database '%s'..."
+                           % self.connection.alias)
                 try:
-                    if verbosity >= 1:
-                        print ("Destroying old test database '%s'..."
-                               % self.connection.alias)
                     subprocess.check_call(["monetdb", "stop", test_database_name])
+                except Exception:
+                    pass
+                try:
                     subprocess.check_call(["monetdb", "destroy", "-f", test_database_name])
                     create_monet_db()
                 except Exception, e:
