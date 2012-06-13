@@ -24,10 +24,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         'date'       : 'DateField',
         'timestamp'  : 'DateTimeField',
         'numeric'    : 'FloatField',
+        'double'    : 'FloatField',
         'int'        : 'IntegerField',
         'smallint'   : 'IntegerField',
         'clob'       : 'TextField',
         'time'       : 'TimeField',
+	'tinyint'	: 'SmallIntegerField',
+	'char'	: 'CharField',
     }
 
     def get_table_description(self, cursor, table_name):
