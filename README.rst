@@ -3,11 +3,15 @@ Djonet is a MonetDB backend for Django.
 Installation
 ============
 
-run::
+run from the source folder::
 
  $ python setup.py install
 
 or make sure the Djonet source directory is in your *PYTHONPATH*.
+
+Djonet is also installable with pip:
+
+ $ pip install djonet
 
 
 Usage
