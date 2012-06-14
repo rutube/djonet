@@ -102,7 +102,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                                 "pkt"."schema_id" = "ps"."id" AND 
                                 "fkt"."schema_id" = "fs"."id" AND 
                                 "fkt"."name" = '%s'""" % (table_name,))
-        return cursor.fetchall()
+        result = cursor.fetchall()
+        return result
 
     def get_primary_key_column(self, cursor, table_name):
         """
@@ -118,5 +119,23 @@ SELECT "objects"."name" AS "COLUMN_NAME"
                          AND "keys"."table_id" = "tables"."id"
                          AND "tables"."schema_id" = "schemas"."id"
                          AND "keys"."type" = 0
-                         AND "tables"."name"='%s'""", (table_name,))
-        return cursor.fetchall()[0][0]
+                         AND "tables"."name"='%s'""" % (table_name,))
+        result =  cursor.fetchall()
+        if result:
+            return result[0][0]
+
+
+    def get_indexes(self, cursor, table_name):
+         """
+         Returns a dictionary of fieldname -> infodict for the given table,
+         where each infodict is in the format:
+             {'primary_key': boolean representing whether it's the primary key,
+              'unique': boolean representing whether it's a unique index}
+         """
+
+         cols = [col[0] for col in self.get_table_description(cursor, table_name)]
+         props = {col: {'primary_key': False, 'unique': False} for col in cols}
+         index = self.get_primary_key_column(cursor, table_name)
+         if index:
+            props[index]['primary_key'] = True
+         return props
