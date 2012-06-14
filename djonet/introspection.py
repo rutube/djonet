@@ -75,3 +75,48 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
 
         return {}
+
+    def get_key_columns(self, cursor, table_name):
+        """
+        Returns a list of (column_name, referenced_table_name,
+        referenced_column_name) for all key columns in given table.
+        """
+        cursor.execute(
+"""                          SELECT "fkkc"."name",
+                                 "pkt"."name",
+                                 "pkkc"."name"
+                          FROM "sys"."_tables" "fkt",
+                               "sys"."objects" "fkkc",
+                               "sys"."keys" "fkk",
+                               "sys"."_tables" "pkt",
+                               "sys"."objects" "pkkc",
+                               "sys"."keys" "pkk",
+                               "sys"."schemas" "ps",
+                               "sys"."schemas" "fs" 
+                         WHERE "fkt"."id" = "fkk"."table_id" AND 
+                                "pkt"."id" = "pkk"."table_id" AND 
+                                "fkk"."id" = "fkkc"."id" AND 
+                                "pkk"."id" = "pkkc"."id" AND 
+                                "fkk"."rkey" = "pkk"."id" AND
+                                "fkkc"."nr" = "pkkc"."nr" AND 
+                                "pkt"."schema_id" = "ps"."id" AND 
+                                "fkt"."schema_id" = "fs"."id" AND 
+                                "fkt"."name" = '%s'""" % (table_name,))
+        return cursor.fetchall()
+
+    def get_primary_key_column(self, cursor, table_name):
+        """
+        Returns the name of the primary key column for the given table
+        """
+        cursor.execute("""
+SELECT "objects"."name" AS "COLUMN_NAME"
+                 FROM "sys"."keys" AS "keys",
+                         "sys"."objects" AS "objects",
+                         "sys"."tables" AS "tables",
+                         "sys"."schemas" AS "schemas"
+                 WHERE "keys"."id" = "objects"."id"
+                         AND "keys"."table_id" = "tables"."id"
+                         AND "tables"."schema_id" = "schemas"."id"
+                         AND "keys"."type" = 0
+                         AND "tables"."name"='%s'""", (table_name,))
+        return cursor.fetchall()[0][0]
