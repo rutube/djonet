@@ -29,8 +29,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         'smallint'   : 'IntegerField',
         'clob'       : 'TextField',
         'time'       : 'TimeField',
-	'tinyint'	: 'SmallIntegerField',
-	'char'	: 'CharField',
+	    'tinyint'	: 'SmallIntegerField',
+	    'char'	: 'CharField',
     }
 
     def get_table_description(self, cursor, table_name):

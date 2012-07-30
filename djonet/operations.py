@@ -13,7 +13,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
- 
+import re
+
+from django.db.backends import util
 from django.db.backends import BaseDatabaseOperations
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -31,6 +33,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     #    'iexact'        : 'ILIKE %s',
     #
 
+    compiler_module = "djonet.compiler"
+
     operators = {
         'gt'        : '>  %s',
         'gte'        : '>= %s',
@@ -45,6 +49,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def quote_name(self, name):
         '''Return quoted name of table, index or column name.'''
+
+        name = re.sub('-', '', name)
 
         if name.startswith('"') and name.endswith('"'):
             return name
@@ -145,6 +151,18 @@ WHERE
                 rval.append(sql)
         return rval
 
+    def value_to_db_decimal(self, value, max_digits, decimal_places):
+        """
+        Transform a decimal.Decimal value to an object compatible with what is
+        expected by the backend driver for decimal (numeric) columns.
+        """
+        if value is None:
+            return None
+
+        # monetdb only supports only 18 digitis for decimal
+        max_digits = min(max_digits, 18)
+        decimal_places = min(decimal_places, 17)
+        return util.format_number(value, max_digits, decimal_places)
 
 #
 #    def date_trunc_sql(self, lookup_type, field_name):

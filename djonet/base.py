@@ -43,7 +43,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _cursor(self):
         settings_dict = self.settings_dict
-        kwargs = {'use_unicode': True}
+        kwargs = {}
         if not self.connection:
             if settings_dict['USER']:
                 kwargs['username'] = settings_dict['USER']

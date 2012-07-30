@@ -32,3 +32,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     related_fields_match_type = False
 
     requires_rollback_on_dirty_transaction = True
+
+    #has_bulk_insert = True
