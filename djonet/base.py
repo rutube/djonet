@@ -1,3 +1,4 @@
+# Copyright (c) 2012, Gijs Molenaar <gijsmolenaar@gmail.com>
 # Copyright (c) 2009 - 2010, Mark Bucciarelli <mkbucc@gmail.com>
 # Copyright (c) 2009 Vikram Bhandoh <vikram@bhandoh.com>
 # 
@@ -19,7 +20,6 @@ from django.conf import settings
 
 import monetdb.sql as Database
 
-from djonet.cursorwrapper import CursorWrapper
 from djonet.introspection import DatabaseIntrospection
 from djonet.creation import DatabaseCreation
 from djonet.operations import DatabaseOperations
@@ -60,4 +60,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         cursor = self.connection.cursor()
         cursor.arraysize = 1000
-    	return CursorWrapper(cursor)
+    	return cursor
