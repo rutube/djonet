@@ -107,5 +107,16 @@ class DatabaseCreation(BaseDatabaseCreation):
             else:
                 print "Tests cancelled."
                 sys.exit(1)
-
         return test_database_name
+
+    def _destroy_test_db(self, test_database_name, verbosity):
+        self._prepare_for_test_db_ddl()
+
+        try:
+            subprocess.check_call(["monetdb", "stop", test_database_name])
+        except Exception:
+            pass
+        try:
+            subprocess.check_call(["monetdb", "destroy", "-f", test_database_name])
+        except Exception, e:
+            sys.stderr.write("Got an error destroying the test database: %s\n" % e)
