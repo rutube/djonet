@@ -19,21 +19,14 @@ from django.db.backends import BaseDatabaseFeatures
 
 class DatabaseFeatures(BaseDatabaseFeatures):
 
-    #
     # I'm not sure about this one.  If MonetDB can select from a table
     # it's updating, then we can leave this as the default of True.
     # Setting it to False is slower but will always work.  See
     # Django's source file db/models/sql/subqueries.py for the only place
     # this is used.
-    #
-
     # TODO: disabled by Gijs since not sure if we need it
     #update_can_self_select = False
 
-    #
-    # Again, I'm not sure about this, so I'll use the more conservative
-    # settings.
-    #
     # Here's a relevant comment from the only file that uses this setting:
     # db/models/fields/related.py:
     #

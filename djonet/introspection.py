@@ -68,14 +68,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_indexes(self, cursor, table_name):
         """
-        Returns a dictionary of fieldname -> infodict for the given table,
-        where each infodict is in the format:
-            {'primary_key': boolean representing whether it's the primary key,
-             'unique': boolean representing whether it's a unique index}
-
-             note: monetdb doesn't support indexes
+        monetdb doesn't support indexes
         """
-
         return {}
 
     def get_key_columns(self, cursor, table_name):
@@ -83,8 +77,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Returns a list of (column_name, referenced_table_name,
         referenced_column_name) for all key columns in given table.
         """
-        cursor.execute(
-"""                          SELECT "fkkc"."name",
+        cursor.execute("""SELECT "fkkc"."name",
                                  "pkt"."name",
                                  "pkkc"."name"
                           FROM "sys"."_tables" "fkt",
@@ -111,8 +104,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         Returns the name of the primary key column for the given table
         """
-        cursor.execute("""
-SELECT "objects"."name" AS "COLUMN_NAME"
+        cursor.execute(""" SELECT "objects"."name" AS "COLUMN_NAME"
                  FROM "sys"."keys" AS "keys",
                          "sys"."objects" AS "objects",
                          "sys"."tables" AS "tables",

@@ -21,20 +21,6 @@ from django.db.backends import util
 from django.db.backends import BaseDatabaseOperations
 
 class DatabaseOperations(BaseDatabaseOperations):
-    '''
-    Tells Django how to build a SQL where clauses from a Django model query.
-
-    Also encapsulates all backend-specific differences, such
-    as the way a backend performs ordering or calculates the ID of
-    a recently-inserted row.
-    '''
-
-    #
-    #    'endswith'        : 'LIKE %s',
-    #    'iendswith'    : 'ILIKE %s',
-    #    'iexact'        : 'ILIKE %s',
-    #
-
     compiler_module = "djonet.compiler"
 
     operators = {
@@ -51,9 +37,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def quote_name(self, name):
         '''Return quoted name of table, index or column name.'''
-
         name = re.sub('-', '', name)
-
         if name.startswith('"') and name.endswith('"'):
             return name
         return '"%s"' % (name,)
@@ -79,19 +63,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         returns the SQL that extracts a value from the given
         date field field_name.
             '''
-
         return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
     def start_transaction_sql(self):
         '''MonetDB uses START TRANSACTION not BEGIN.'''
-
         return 'START TRANSACTION;'
 
     def model_to_sequencesql(self, m):
         '''Make the SQL statement that updates the tables primary
         key sequence.  Return empty string if no SQL needed.
         '''
-
         from django.db import connection
 
         # tbl has app_label prefix; e.g., testapp_simple
@@ -153,20 +134,7 @@ WHERE
                 rval.append(sql)
         return rval
 
-    def value_to_db_decimal(self, value, max_digits, decimal_places):
-        """
-        Transform a decimal.Decimal value to an object compatible with what is
-        expected by the backend driver for decimal (numeric) columns.
-        """
-        if value is None:
-            return None
 
-        # monetdb only supports only 18 digitis for decimal
-        max_digits = min(max_digits, 18)
-        decimal_places = min(decimal_places, 17)
-        return util.format_number(value, max_digits, decimal_places)
-
-#
 #    def date_trunc_sql(self, lookup_type, field_name):
 #        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
 #        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') 

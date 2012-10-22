@@ -18,26 +18,9 @@
 
 import subprocess
 import sys
-
-#from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
 
 class DatabaseCreation(BaseDatabaseCreation):
-
-    #
-    # XXX: I didn't see where to define the max int values that fit
-    # XXX: in the int fields.  The Positive* variants will hold less
-    # XXX: than expected, as they use same type as the non-Positive*
-    # XXX: ones.
-    #
-
-    #
-    # Careful with things like %(max_digits)s.  If Django does not
-    # require the property, then db_type() will return None (as
-    # there will be a key error with the data dictionary, and the
-    # field will not be added to the database table!
-    #
-
     data_types = {
         'AutoField'			: 'int AUTO_INCREMENT',
         'BooleanField'		: 'boolean',
@@ -63,9 +46,6 @@ class DatabaseCreation(BaseDatabaseCreation):
     }
 
     def _create_test_db(self, verbosity, autoclobber):
-        """
-        Internal implementation - creates the test db tables.
-        """
         test_database_name = self._get_test_db_name()
 
         def create_monet_db():
