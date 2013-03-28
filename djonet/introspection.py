@@ -128,7 +128,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
          """
 
          cols = [col[0] for col in self.get_table_description(cursor, table_name)]
-         props = {col: {'primary_key': False, 'unique': False} for col in cols}
+         props = dict([(col, {'primary_key': False, 'unique': False}) for col in cols])
          index = self.get_primary_key_column(cursor, table_name)
          if index:
             props[index]['primary_key'] = True
