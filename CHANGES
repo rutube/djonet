@@ -1,0 +1,6 @@
+CHANGES
+=======
+
+2013-03-28
+----------
+ * made compatible with python 2.6 (removed dict comprehension)
