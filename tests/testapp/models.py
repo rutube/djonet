@@ -108,7 +108,7 @@ class CommonFieldTypes(models.Model):
 
 	created = models.DateTimeField('created', auto_now_add=True)
 
-	url = models.URLField(verify_exists=False, max_length=500, blank=True)
+	url = models.URLField(max_length=500, blank=True)
 
 	weight = models.PositiveIntegerField()
 
