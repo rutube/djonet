@@ -19,6 +19,18 @@
 import subprocess
 import sys
 from django.db.backends.creation import BaseDatabaseCreation
+from django.conf import settings
+import monetdb.control
+import monetdb.sql
+
+
+auth_query = """
+ALTER USER "monetdb" RENAME TO "%(username)s";
+ALTER USER SET PASSWORD '%(password)s' USING OLD PASSWORD 'monetdb';
+CREATE SCHEMA "%(database)s" AUTHORIZATION "%(username)s";
+ALTER USER "%(username)s" SET SCHEMA "%(database)s";
+"""
+
 
 class DatabaseCreation(BaseDatabaseCreation):
     data_types = {
@@ -45,42 +57,58 @@ class DatabaseCreation(BaseDatabaseCreation):
         'TimeField'			: 'time',
     }
 
+    def __init__(self, *args, **kwargs):
+        super(DatabaseCreation, self).__init__(*args, **kwargs)
+        self.monetdb_hostname = settings.MONETDB_HOSTNAME
+        self.monetdb_port = settings.MONETDB_PORT
+        self.monetdb_passphrase = settings.MONETDB_PASSPHRASE
+        self.test_database_name = self._get_test_db_name()
+        self.test_database_user = self.connection.settings_dict['USER']
+        self.test_database_password = self.connection.settings_dict['PASSWORD']
+        self.test_database_host = self.connection.settings_dict['HOST']
+        self.test_database_port = self.connection.settings_dict['PORT']
+        self.monetdb_control = monetdb.control.Control(self.monetdb_hostname,
+                                                       self.monetdb_port,
+                                                       self.monetdb_passphrase)
+
+
     def _create_test_db(self, verbosity, autoclobber):
-        test_database_name = self._get_test_db_name()
 
         def create_monet_db():
-            errorcode = subprocess.check_call(["monetdb", "create", test_database_name])
-            if not errorcode:
-                errorcode = subprocess.check_call(["monetdb", "release", test_database_name])
-            if not errorcode:
-                errorcode = subprocess.check_call(["monetdb", "start", test_database_name])
-            return errorcode
+            self.monetdb_control.create(self.test_database_name)
+            self.monetdb_control.release(self.test_database_name)
+            self.monetdb_control.start(self.test_database_name)
+
+            con = monetdb.sql.connect(hostname=self.test_database_host,
+                                      port=self.test_database_port,
+                                      database=self.test_database_name,
+                                      username="monetdb",
+                                      password="monetdb")
+
+            if self.test_database_user != "monetdb":
+                cur = con.cursor()
+                params = {
+                    'username': self.test_database_user,
+                    'password': self.test_database_password,
+                    'database': self.test_database_name,
+                }
+                cur.execute(auth_query % params)
 
         try:
             create_monet_db()
-        except OSError, e:
-            sys.stderr.write(
-                "Can't find monetdb, make sure it is installed and in your PATH: %s\n" % e)
-            import os
-            sys.stderr.write(os.environ['PATH'])
-            sys.exit(2)
-        except subprocess.CalledProcessError, e:
+        except monetdb.sql.OperationalError, e:
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
             if not autoclobber:
                 confirm = raw_input(
                     "Type 'yes' if you would like to try deleting the test "
-                    "database '%s', or 'no' to cancel: " % test_database_name)
+                    "database '%s', or 'no' to cancel: " % self.test_database_name)
             if autoclobber or confirm == 'yes':
                 if verbosity >= 1:
                     print ("Destroying old test database '%s'..."
                            % self.connection.alias)
                 try:
-                    subprocess.check_call(["monetdb", "stop", test_database_name])
-                except Exception:
-                    pass
-                try:
-                    subprocess.check_call(["monetdb", "destroy", "-f", test_database_name])
+                    self._destroy_test_db(self.test_database_name, verbosity)
                     create_monet_db()
                 except Exception, e:
                     sys.stderr.write(
@@ -89,16 +117,15 @@ class DatabaseCreation(BaseDatabaseCreation):
             else:
                 print "Tests cancelled."
                 sys.exit(1)
-        return test_database_name
+        return self.test_database_name
 
     def _destroy_test_db(self, test_database_name, verbosity):
         self._prepare_for_test_db_ddl()
-
+        print "stopping %s" % test_database_name
         try:
-            subprocess.check_call(["monetdb", "stop", test_database_name])
-        except Exception:
+            self.monetdb_control.stop(self.test_database_name)
+        except monetdb.sql.OperationalError, e:
+            print "warning: can't stop database"
             pass
-        try:
-            subprocess.check_call(["monetdb", "destroy", "-f", test_database_name])
-        except Exception, e:
-            sys.stderr.write("Got an error destroying the test database: %s\n" % e)
+        print "destroying %s" % test_database_name
+        self.monetdb_control.destroy(self.test_database_name)
