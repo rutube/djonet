@@ -18,23 +18,29 @@
 import re
 from django.db.models.sql import compiler
 
+
 class SQLCompiler(compiler.SQLCompiler):
     def as_sql(self, with_limits=True, with_col_aliases=False):
         sql = super(SQLCompiler, self).as_sql(with_limits, with_col_aliases)
         # replace != with <> since MonetDB doesn't support !=
         return tuple([re.sub('!=', '<>', sql[0])] + list(sql[1:]))
 
+
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
     pass
+
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
     pass
 
+
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
     pass
 
+
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):
     pass
+
 
 class SQLDateCompiler(compiler.SQLDateCompiler, SQLCompiler):
     pass
