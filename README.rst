@@ -5,13 +5,13 @@ Installation
 
 run from the source folder::
 
- $ python setup.py install
+    $ python setup.py install
 
 or make sure the Djonet source directory is in your *PYTHONPATH*.
 
 Djonet is also installable with pip::
 
- $ pip install djonet
+    $ pip install djonet
 
 
 Usage
@@ -19,18 +19,29 @@ Usage
 
 put something like this in your Django *settings.py*::
 
- DATABASES = {
-     'default': {
-         'ENGINE': 'djonet',
-         'NAME': 'database_name',
-         'USER': 'database_user',
-         'PASSWORD': 'database_password',
-         'HOST': 'database_host',
-         'PORT': '5000',
-     }
- }
+    DATABASES = {
+        'default': {
+            'ENGINE': 'djonet',
+            'NAME': 'test',
+            'USER': 'test',
+            'PASSWORD': 'test',
+            'HOST': 'localhost',
+            'PORT': 5000,
+        }
+    }
+
+
+If you want to issue management commands, like creating (test) databases you
+need to add something like this to your *settings.py* also::
+
+    MONETDB_HOST = 'localhost'
+    MONETDB_PORT = 50000
+    MONETDB_PASSPHRASE = 'test'
+
 
 About
 =====
- * http://www.monetdb.org/
+
+* http://www.monetdb.org/
+* http://www.django.org/
 
