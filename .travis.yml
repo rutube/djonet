@@ -8,7 +8,7 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -qq monetdb5-sql monetdb-client
  - sudo usermod -a -G monetdb $USER
- - echo "STARTUP=ues\nDBFARM=/var/lib/monetdb\n" > /etc/default/monetdb5-sql
+ - sudo sh -c "echo 'STARTUP=ues\nDBFARM=/var/lib/monetdb\n' > /etc/default/monetdb5-sql"
  - sudo service monetdb5-sql start
 install: pip install -r requirements.txt --use-mirrors
 script:  python tests/tests.py
