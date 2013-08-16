@@ -59,9 +59,9 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def __init__(self, *args, **kwargs):
         super(DatabaseCreation, self).__init__(*args, **kwargs)
-        self.monetdb_hostname = settings.MONETDB_HOSTNAME
-        self.monetdb_port = settings.MONETDB_PORT
-        self.monetdb_passphrase = settings.MONETDB_PASSPHRASE
+        self.monetdb_hostname = getattr(settings, 'MONETDB_HOSTNAME', 'localhost')
+        self.monetdb_port = getattr(settings, 'MONETDB_PORT', 50000)
+        self.monetdb_passphrase = getattr(settings, 'MONETDB_PASSPHRASE', 'testdb')
         self.test_database_name = self._get_test_db_name()
         self.test_database_user = self.connection.settings_dict['USER']
         self.test_database_password = self.connection.settings_dict['PASSWORD']
