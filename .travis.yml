@@ -10,5 +10,8 @@ before_install:
  - sudo usermod -a -G monetdb $USER
  - sudo sh -c "echo 'STARTUP=yes\nDBFARM=/var/lib/monetdb\n' > /etc/default/monetdb5-sql"
  - sudo service monetdb5-sql start
+ - sudo monetdbd set control=yes /var/lib/monetdb
+ - sudo monetdbd set passphrase=testdb /var/lib/monetdb
+
 install: pip install -r requirements.txt --use-mirrors
 script:  python tests/tests.py
