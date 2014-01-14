@@ -1,4 +1,7 @@
-Djonet is a MonetDB backend for Django.
+About
+=====
+
+Djonet is a MonetDB backend for Django. It is not complete, but works for us.
 
 Installation
 ============
