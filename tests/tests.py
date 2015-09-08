@@ -28,11 +28,11 @@ from django.conf import settings
 
 MONETDB_HOST = 'localhost'
 MONETDB_PORT = 50000
-MONETDB_PASSPHRASE = 'testdb'
+MONETDB_PASSPHRASE = 'monetdb'
 
-db = 'testdjangodb1'
-user = 'django1'
-passwd = 'django1'
+db = 'test_djonet'
+user = 'test_djonet'
+passwd = 'test_djonet'
 
 settings.configure(
     DEBUG=True,

@@ -86,7 +86,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name
         return '"%s"' % (name,)
 
-    def sql_flush(self, style, tables, sequences):
+    def sql_flush(self, style, tables, sequences, allow_cascade=False):
         """
         Returns a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
@@ -131,6 +131,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         date field field_name.
             """
         return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
+
+    def date_trunc_sql(self, lookup_type, field_name):
+        return "%s" % field_name
 
     def start_transaction_sql(self):
         """MonetDB uses START TRANSACTION not BEGIN."""
@@ -193,3 +196,6 @@ WHERE
             if sql:
                 results.append(sql)
         return results
+
+    def random_function_sql(self):
+        return "RAND()"

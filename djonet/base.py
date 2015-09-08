@@ -30,6 +30,8 @@ IntegrityError = Database.IntegrityError
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = DatabaseOperations.operators
 
+    Database = Database
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
@@ -39,20 +41,45 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.creation = DatabaseCreation(self)
 
-    def _cursor(self):
-        kwargs = {}
-        if not self.connection:
-            if self.settings_dict['USER']:
-                kwargs['username'] = self.settings_dict['USER']
-            if self.settings_dict['NAME']:
-                kwargs['database'] = self.settings_dict['NAME']
-            if self.settings_dict['PASSWORD']:
-                kwargs['password'] = self.settings_dict['PASSWORD']
-            if self.settings_dict['HOST']:
-                kwargs['hostname'] = self.settings_dict['HOST']
-            if self.settings_dict['PORT']:
-                kwargs['port'] = int(self.settings_dict['PORT'])
-            self.connection = Database.connect(**kwargs)
+    def create_cursor(self):
+        if not self.is_usable():
+            conn_params = self.get_connection_params()
+            self.connection = self.get_new_connection(conn_params)
         cursor = self.connection.cursor()
         cursor.arraysize = 1000
         return cursor
+
+    def get_connection_params(self):
+        kwargs = {}
+        if self.settings_dict['USER']:
+            kwargs['username'] = self.settings_dict['USER']
+        if self.settings_dict['NAME']:
+            kwargs['database'] = self.settings_dict['NAME']
+        if self.settings_dict['PASSWORD']:
+            kwargs['password'] = self.settings_dict['PASSWORD']
+        if self.settings_dict['HOST']:
+            kwargs['hostname'] = self.settings_dict['HOST']
+        if self.settings_dict['PORT']:
+            kwargs['port'] = int(self.settings_dict['PORT'])
+        return kwargs
+
+    def get_new_connection(self, conn_params):
+        conn = Database.connect(**conn_params)
+        return conn
+
+    def init_connection_state(self):
+        pass
+
+    def _set_autocommit(self, autocommit):
+        self.connection.set_autocommit(autocommit)
+
+    def is_usable(self):
+        if not self.connection:
+            return False
+        try:
+            self.connection.execute('SELECT 1;')
+        except Database.Error:
+            return False
+        else:
+            return True
+

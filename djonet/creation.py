@@ -16,13 +16,12 @@
 #
 
 
-import subprocess
 import sys
+
 from django.db.backends.creation import BaseDatabaseCreation
 from django.conf import settings
 import monetdb.control
 import monetdb.sql
-
 
 auth_query = """
 ALTER USER "monetdb" RENAME TO "%(username)s";
@@ -34,34 +33,37 @@ ALTER USER "%(username)s" SET SCHEMA "%(database)s";
 
 class DatabaseCreation(BaseDatabaseCreation):
     data_types = {
-        'AutoField'			: 'int AUTO_INCREMENT',
-        'BooleanField'		: 'boolean',
-        'CharField'			: 'varchar(%(max_length)s)',
+        'AutoField': 'int AUTO_INCREMENT',
+        'BooleanField': 'boolean',
+        'CharField': 'varchar(%(max_length)s)',
         'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-        'DateField'			: 'date',
-        'DateTimeField'		: 'timestamp',
-        'DecimalField'		: 'numeric(%(max_digits)s, %(decimal_places)s)',
-        'FileField'			: 'varchar(%(max_length)s)',
-        'FilePathField'		: 'varchar(%(max_length)s)',
-        'FloatField'		: 'float',
-        'IntegerField'		: 'int',
-        'IPAddressField'		: 'char(15)',
+        'DateField': 'date',
+        'DateTimeField': 'timestamp',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'float',
+        'IntegerField': 'int',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
-        'NullBooleanField'		: 'boolean',
-        'OneToOneField'		: 'int',
-        'PositiveIntegerField'	: 'int',
-        'PositiveSmallIntegerField'	: 'smallint',
-        'SlugField'			: 'varchar(%(max_length)s)',
-        'SmallIntegerField'		: 'smallint',
-        'TextField'			: 'clob',
-        'TimeField'			: 'time',
+        'NullBooleanField': 'boolean',
+        'OneToOneField': 'int',
+        'PositiveIntegerField': 'int',
+        'PositiveSmallIntegerField': 'smallint',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'clob',
+        'TimeField': 'time',
     }
 
     def __init__(self, *args, **kwargs):
         super(DatabaseCreation, self).__init__(*args, **kwargs)
-        self.monetdb_hostname = getattr(settings, 'MONETDB_HOSTNAME', 'localhost')
+        self.monetdb_hostname = getattr(settings, 'MONETDB_HOSTNAME',
+                                        'localhost')
         self.monetdb_port = getattr(settings, 'MONETDB_PORT', 50000)
-        self.monetdb_passphrase = getattr(settings, 'MONETDB_PASSPHRASE', 'testdb')
+        self.monetdb_passphrase = getattr(settings, 'MONETDB_PASSPHRASE',
+                                          'testdb')
         self.test_database_name = self._get_test_db_name()
         self.test_database_user = self.connection.settings_dict['USER']
         self.test_database_password = self.connection.settings_dict['PASSWORD']
@@ -70,7 +72,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         self.monetdb_control = monetdb.control.Control(self.monetdb_hostname,
                                                        self.monetdb_port,
                                                        self.monetdb_passphrase)
-
 
     def _create_test_db(self, verbosity, autoclobber):
 
@@ -120,7 +121,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         return self.test_database_name
 
     def _destroy_test_db(self, test_database_name, verbosity):
-        self._prepare_for_test_db_ddl()
         print "stopping %s" % test_database_name
         try:
             self.monetdb_control.stop(self.test_database_name)

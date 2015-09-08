@@ -49,3 +49,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     # no we can not add a reference to a foreign key if the target doesn't exist
     supports_forward_references = False
+
+    can_rollback_ddl = True
