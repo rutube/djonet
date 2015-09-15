@@ -16,7 +16,7 @@
 #
 
 import re
-from django.db.backends import BaseDatabaseOperations
+from django.db.backends.base.operations import BaseDatabaseOperations
 from djonet.introspection import DatabaseIntrospection
 
 

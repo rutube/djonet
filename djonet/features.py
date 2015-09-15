@@ -15,7 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-from django.db.backends import BaseDatabaseFeatures
+from django.db.backends.base.features import BaseDatabaseFeatures
 
 class DatabaseFeatures(BaseDatabaseFeatures):
 

@@ -18,7 +18,7 @@
 
 import subprocess
 import sys
-from django.db.backends.creation import BaseDatabaseCreation
+from django.db.backends.base.creation import BaseDatabaseCreation
 from django.conf import settings
 import monetdb.control
 import monetdb.sql
@@ -33,29 +33,6 @@ ALTER USER "%(username)s" SET SCHEMA "%(database)s";
 
 
 class DatabaseCreation(BaseDatabaseCreation):
-    data_types = {
-        'AutoField'			: 'int AUTO_INCREMENT',
-        'BooleanField'		: 'boolean',
-        'CharField'			: 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-        'DateField'			: 'date',
-        'DateTimeField'		: 'timestamp',
-        'DecimalField'		: 'numeric(%(max_digits)s, %(decimal_places)s)',
-        'FileField'			: 'varchar(%(max_length)s)',
-        'FilePathField'		: 'varchar(%(max_length)s)',
-        'FloatField'		: 'float',
-        'IntegerField'		: 'int',
-        'IPAddressField'		: 'char(15)',
-        'GenericIPAddressField': 'char(39)',
-        'NullBooleanField'		: 'boolean',
-        'OneToOneField'		: 'int',
-        'PositiveIntegerField'	: 'int',
-        'PositiveSmallIntegerField'	: 'smallint',
-        'SlugField'			: 'varchar(%(max_length)s)',
-        'SmallIntegerField'		: 'smallint',
-        'TextField'			: 'clob',
-        'TimeField'			: 'time',
-    }
 
     def __init__(self, *args, **kwargs):
         super(DatabaseCreation, self).__init__(*args, **kwargs)
