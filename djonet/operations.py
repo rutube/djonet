@@ -16,6 +16,7 @@
 #
 
 import re
+
 from django.db.backends import BaseDatabaseOperations
 from djonet.introspection import DatabaseIntrospection
 
@@ -126,14 +127,80 @@ class DatabaseOperations(BaseDatabaseOperations):
         return sql
 
     def date_extract_sql(self, lookup_type, field_name):
-        """Given a lookup_type of 'year', 'month' or 'day',
-        returns the SQL that extracts a value from the given
-        date field field_name.
-            """
+        """
+        Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
+        extracts a value from the given date field field_name.
+        """
         return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
+    def date_interval_sql(self, sql, connector, timedelta):
+        """
+        Implements the date interval functionality for expressions
+        """
+        raise NotImplementedError()
+
     def date_trunc_sql(self, lookup_type, field_name):
-        return "%s" % field_name
+        """
+        Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
+        truncates the given date field field_name to a date object with only
+        the given specificity.
+        """
+        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')
+        format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
+        try:
+            i = fields.index(lookup_type) + 1
+        except ValueError:
+            sql = field_name
+        else:
+            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            sql = "CAST(date_to_str(%s, '%s') AS DATE)" % (field_name, format_str)
+        return sql
+
+    def datetime_cast_sql(self):
+        """
+        Returns the SQL necessary to cast a datetime value so that it will be
+        retrieved as a Python datetime object instead of a string.
+
+        This SQL should include a '%s' in place of the field's name.
+        """
+        return "%s"
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        """
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
+        'second', returns the SQL that extracts a value from the given
+        datetime field field_name, and a tuple of parameters.
+        """
+        # FIXME TZ support
+        return "EXTRACT(%s FROM %s)" % (lookup_type, field_name), []
+
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+        """
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
+        'second', returns the SQL that truncates the given datetime field
+        field_name to a datetime object with only the given specificity, and
+        a tuple of parameters.
+        """
+        #FIXME TZ support
+        # if settings.USE_TZ:
+        #     field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
+        #     params = [tzname]
+        # else:
+        #     params = []
+        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        # Use double percents to escape.
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')
+        format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
+        try:
+            i = fields.index(lookup_type) + 1
+        except ValueError:
+            sql = field_name
+        else:
+            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            sql = "CAST(timestamp_to_str(%s, '%s') AS TIMESTAMP)" % (field_name, format_str)
+
+        return sql, []
 
     def start_transaction_sql(self):
         """MonetDB uses START TRANSACTION not BEGIN."""
@@ -162,7 +229,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         #     sql>
         #
 
-        c = connection.cursor()
+        c = self.connection.cursor()
         fmt = """
 SELECT
   "default"

@@ -27,6 +27,38 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 
+class CursorWrapper(object):
+    """
+    A thin wrapper around MonetDB normal cursor class so that we can tune SQL
+    before execute.
+    """
+    def __init__(self, cursor):
+        self.cursor = cursor
+
+    def execute(self, query, args=None):
+        if not args:
+            # remove escaping %%
+            query = query % ()
+            args = None
+        return self.cursor.execute(query, args)
+
+    def executemany(self, query, args):
+        if not args:
+            # remove escaping %%
+            query = query % ()
+            args = None
+        return self.cursor.executemany(query, args)
+
+    def __getattr__(self, attr):
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            return getattr(self.cursor, attr)
+
+    def __iter__(self):
+        return iter(self.cursor)
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = DatabaseOperations.operators
 
@@ -47,7 +79,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection = self.get_new_connection(conn_params)
         cursor = self.connection.cursor()
         cursor.arraysize = 1000
-        return cursor
+        return CursorWrapper(cursor)
 
     def get_connection_params(self):
         kwargs = {}
