@@ -105,6 +105,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def _set_autocommit(self, autocommit):
         self.connection.set_autocommit(autocommit)
 
+    def ensure_connection(self):
+        """
+        Guarantees that a connection to the database is established.
+        """
+        if self.connection is None:
+            super(DatabaseWrapper, self).ensure_connection()
+        elif not self.is_usable():
+            self.close()
+            self.connect()
+
     def is_usable(self):
         if not self.connection:
             return False
