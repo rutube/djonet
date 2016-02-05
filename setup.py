@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='djonet',
-    version='0.3-rt02',
+    version='0.3-rt03',
     description='MonetDB backend for Django',
     author='Gijs Molenaar',
     author_email='gijsmolenaar@gmail.com',
