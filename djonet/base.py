@@ -120,7 +120,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         try:
             self.connection.execute('SELECT 1;')
-        except Database.Error:
+        except Exception:
             return False
         else:
             return True
