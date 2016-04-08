@@ -20,6 +20,7 @@ import sys
 
 from django.db.backends.creation import BaseDatabaseCreation
 from django.conf import settings
+from django.utils.functional import cached_property
 import monetdb.control
 import monetdb.sql
 
@@ -69,9 +70,12 @@ class DatabaseCreation(BaseDatabaseCreation):
         self.test_database_password = self.connection.settings_dict['PASSWORD']
         self.test_database_host = self.connection.settings_dict['HOST']
         self.test_database_port = self.connection.settings_dict['PORT']
-        self.monetdb_control = monetdb.control.Control(self.monetdb_hostname,
-                                                       self.monetdb_port,
-                                                       self.monetdb_passphrase)
+
+    @cached_property
+    def monetdb_control(self):
+        return monetdb.control.Control(self.monetdb_hostname,
+                                       self.monetdb_port,
+                                       self.monetdb_passphrase)
 
     def _create_test_db(self, verbosity, autoclobber):
 
