@@ -15,7 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-from django.db.backends import *
+from django.db.backends.base.base import *
 import monetdb.sql as Database
 from djonet.introspection import DatabaseIntrospection
 from djonet.creation import DatabaseCreation
@@ -60,6 +60,31 @@ class CursorWrapper(object):
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
+    vendor = 'monetdb'
+    data_types = {
+        'AutoField'         : 'int AUTO_INCREMENT',
+        'BooleanField'      : 'boolean',
+        'CharField'         : 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField'         : 'date',
+        'DateTimeField'     : 'timestamp',
+        'DecimalField'      : 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'FileField'         : 'varchar(%(max_length)s)',
+        'FilePathField'     : 'varchar(%(max_length)s)',
+        'FloatField'        : 'float',
+        'IntegerField'      : 'int',
+        'IPAddressField'        : 'char(15)',
+        'GenericIPAddressField': 'char(39)',
+        'NullBooleanField'      : 'boolean',
+        'OneToOneField'     : 'int',
+        'PositiveIntegerField'  : 'int',
+        'PositiveSmallIntegerField' : 'smallint',
+        'SlugField'         : 'varchar(%(max_length)s)',
+        'SmallIntegerField'     : 'smallint',
+        'TextField'         : 'clob',
+        'TimeField'         : 'time',
+    }
+
     operators = DatabaseOperations.operators
 
     Database = Database
@@ -69,9 +94,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
-        self.validation = DatabaseValidation(self)
-        self.introspection = DatabaseIntrospection(self)
         self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = DatabaseValidation(self)
 
     def create_cursor(self):
         if not self.is_usable():
