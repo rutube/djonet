@@ -15,7 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-from django.db.backends import BaseDatabaseValidation
+from django.db.backends.base.validation import BaseDatabaseValidation
 
 
 class DatabaseValidation(BaseDatabaseValidation):

@@ -15,7 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-from django.db.backends import BaseDatabaseIntrospection
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
