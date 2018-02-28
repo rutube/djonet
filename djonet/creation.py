@@ -54,7 +54,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                                        self.monetdb_port,
                                        self.monetdb_passphrase)
 
-    def _create_test_db(self, verbosity, autoclobber):
+    def _create_test_db(self, verbosity, autoclobber, keepdb=False):
 
         def create_monet_db():
             self.monetdb_control.create(self.test_database_name)
