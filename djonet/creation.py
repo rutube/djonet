@@ -54,7 +54,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                                        self.monetdb_port,
                                        self.monetdb_passphrase)
 
-    def _create_test_db(self, verbosity, autoclobber):
+    def _create_test_db(self, verbosity, autoclobber, keepdb=False):
 
         def create_monet_db():
             self.monetdb_control.create(self.test_database_name)
@@ -81,6 +81,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         except monetdb.sql.OperationalError, e:
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
+            if keepdb:
+                return self.test_database_name
             if not autoclobber:
                 confirm = raw_input(
                     "Type 'yes' if you would like to try deleting the test "
