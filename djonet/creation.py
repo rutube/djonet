@@ -81,6 +81,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         except monetdb.sql.OperationalError, e:
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
+            if keepdb:
+                return self.test_database_name
             if not autoclobber:
                 confirm = raw_input(
                     "Type 'yes' if you would like to try deleting the test "
