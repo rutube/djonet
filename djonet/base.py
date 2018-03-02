@@ -16,7 +16,8 @@
 #
 
 from django.db.backends import *
-import monetdb.sql as Database
+import pymonetdb as Database
+
 from djonet.introspection import DatabaseIntrospection
 from djonet.creation import DatabaseCreation
 from djonet.operations import DatabaseOperations

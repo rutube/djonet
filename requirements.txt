@@ -1,3 +1,2 @@
-python-monetdb
+pymonetdb
 django
-
