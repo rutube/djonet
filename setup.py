@@ -9,5 +9,5 @@ setup(name='djonet',
     author_email='gijsmolenaar@gmail.com',
     url='https://github.com/gijzelaerr/djonet',
     packages=['djonet'],
-    requires=['python_monetdb', 'django']
+    requires=['pymonetdb', 'django']
 )

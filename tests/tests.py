@@ -17,8 +17,8 @@
 import subprocess
 import sys
 import unittest
-import monetdb.control
-import monetdb.sql
+import pymonetdb.control
+import pymonetdb
 
 from django.conf import settings
 
@@ -67,11 +67,11 @@ sys.path.append('..')
 class SubprocessError(Exception): pass
 
 def create_database(name, user, password):
-    control = monetdb.control.Control(MONETDB_HOST, MONETDB_PORT, MONETDB_PASSPHRASE)
+    control = pymonetdb.control.Control(MONETDB_HOST, MONETDB_PORT, MONETDB_PASSPHRASE)
     control.create(name)
     control.release(name)
 
-    con = monetdb.sql.connect(username='monetdb', password='monetdb',
+    con = pymonetdb.connect(username='monetdb', password='monetdb',
                               hostname=MONETDB_HOST, port=MONETDB_PORT,
                               database=name)
     cur = con.cursor()
@@ -85,10 +85,10 @@ def create_database(name, user, password):
 
 
 def destroy_database(name):
-    control = monetdb.control.Control(MONETDB_HOST, MONETDB_PORT, MONETDB_PASSPHRASE)
+    control = pymonetdb.control.Control(MONETDB_HOST, MONETDB_PORT, MONETDB_PASSPHRASE)
     try:
         control.stop(name)
-    except monetdb.exceptions.OperationalError:
+    except pymonetdb.OperationalError:
         pass
     control.destroy(name)
 
@@ -100,7 +100,7 @@ class TestMonetDjango(unittest.TestCase):
     def setUp(self):
         try:
             destroy_database(db)
-        except monetdb.exceptions.OperationalError:
+        except pymonetdb.OperationalError:
             pass
         create_database(db, user, passwd)
 

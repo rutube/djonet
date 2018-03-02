@@ -22,8 +22,8 @@ from django.db.backends.base.creation import BaseDatabaseCreation
 
 from django.conf import settings
 from django.utils.functional import cached_property
-import monetdb.control
-import monetdb.sql
+import pymonetdb.control
+import pymonetdb
 
 auth_query = """
 ALTER USER "monetdb" RENAME TO "%(username)s";
@@ -50,7 +50,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     @cached_property
     def monetdb_control(self):
-        return monetdb.control.Control(self.monetdb_hostname,
+        return pymonetdb.control.Control(self.monetdb_hostname,
                                        self.monetdb_port,
                                        self.monetdb_passphrase)
 
@@ -61,11 +61,11 @@ class DatabaseCreation(BaseDatabaseCreation):
             self.monetdb_control.release(self.test_database_name)
             self.monetdb_control.start(self.test_database_name)
 
-            con = monetdb.sql.connect(hostname=self.test_database_host,
-                                      port=self.test_database_port,
-                                      database=self.test_database_name,
-                                      username="monetdb",
-                                      password="monetdb")
+            con = pymonetdb.connect(hostname=self.test_database_host,
+                                   port=self.test_database_port,
+                                   database=self.test_database_name,
+                                   username="monetdb",
+                                   password="monetdb")
 
             if self.test_database_user != "monetdb":
                 cur = con.cursor()
@@ -78,11 +78,11 @@ class DatabaseCreation(BaseDatabaseCreation):
 
         try:
             create_monet_db()
-        except monetdb.sql.OperationalError, e:
+        except pymonetdb.OperationalError, e:
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
             if keepdb:
-                return self.test_database_name
+                return
             if not autoclobber:
                 confirm = raw_input(
                     "Type 'yes' if you would like to try deleting the test "
@@ -107,7 +107,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         print "stopping %s" % test_database_name
         try:
             self.monetdb_control.stop(self.test_database_name)
-        except monetdb.sql.OperationalError, e:
+        except pymonetdb.OperationalError, e:
             print "warning: can't stop database"
             pass
         print "destroying %s" % test_database_name
